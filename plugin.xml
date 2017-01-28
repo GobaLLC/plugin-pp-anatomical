@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
-        id="com.example.helloplugin"
+        id="com.medcenterdisplay.anatomyplugin"
         version="0.7.0">
 
-  <name>Hello</name>
-  <description>Hello plugin.</description>
+  <name>Anatomy Plugin</name>
+  <description>Anatomy plugin.</description>
   <engines>
     <engine name="cordova" version=">=3.4.0"/>
   </engines>
 
-  <asset src="www/hello.js" target="js/hello.js"/>
+  <asset src="www/anatomyplugin.js" target="js/anatomyplugin.js"/>
 
-  <js-module src="www/hello.js" name="hello">
-    <clobbers target="hello" />
+  <js-module src="www/anatomyplugin.js" name="anatomyplugin">
+    <clobbers target="anatomyplugin" />
   </js-module>
 
 
   <platform name="ios">
 
     <config-file target="config.xml" parent="/*">
-      <feature name="Hello">
-        <param name="ios-package" value="HWPHello" />
+      <feature name="AnatomyPlugin">
+        <param name="ios-package" value="AnatomyPlugin" />
       </feature>
     </config-file>
 
-    <header-file src="src/ios/HWPHello.h"/>
-    <source-file src="src/ios/HWPHello.m"/>
+    <header-file src="src/ios/AnatomyPlugin.h"/>
+    <source-file src="src/ios/AnatomyPlugin.m"/>
     <header-file src="src/ios/AnatomyViewController.h" />
     <source-file src="src/ios/AnatomyViewController.m" />
     <resource-file src="src/ios/AnatomyViewController.xib" />
@@ -40,8 +40,9 @@
     <header-file src="src/ios/ThirdParty/MBProgressHUD/MBProgressHUD.h" target-dir="ThirdParty/MBProgressHUD" />
     <source-file src="src/ios/ThirdParty/MBProgressHUD/MBProgressHUD.m" target-dir="ThirdParty/MBProgressHUD" />
 
-    <resource-file src="src/ios/Resources/newBG-detailPage@2x.png" target-dir="Resources" />
-    
+    <resource-file src="src/ios/Resources/anatomyViewBg.png"  />
+    <resource-file src="src/ios/Resources/anatomyViewBg@2x.png" />
+
   </platform>
 
 </plugin>

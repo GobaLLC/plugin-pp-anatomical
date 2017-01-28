@@ -19,14 +19,14 @@
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
-            <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="newBG-detailPage" translatesAutoresizingMaskIntoConstraints="NO" id="ngb-uu-RHU">
-                    <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="anatomyViewBg.png" translatesAutoresizingMaskIntoConstraints="NO" id="ngb-uu-RHU">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                 </imageView>
-                <view contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="87l-W7-cUr">
-                    <rect key="frame" x="15" y="94" width="344" height="459"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="87l-W7-cUr">
+                    <rect key="frame" x="0.0" y="44" width="374" height="546"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </view>
                 <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="rY7-WY-zWc">
@@ -37,7 +37,7 @@
                     </connections>
                 </slider>
                 <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="dZM-8x-xI4">
-                    <rect key="frame" x="28" y="536" width="319" height="31"/>
+                    <rect key="frame" x="28" y="600" width="319" height="31"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="30" id="50O-nn-xq6"/>
                     </constraints>
@@ -45,26 +45,42 @@
                         <action selector="frameSliderValueChanged:" destination="-1" eventType="valueChanged" id="v3x-KI-Xv2"/>
                     </connections>
                 </slider>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yQ6-Ja-qmv">
+                    <rect key="frame" x="10" y="6" width="60" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="60" id="Gad-UF-EbG"/>
+                        <constraint firstAttribute="height" constant="44" id="pLF-qQ-6ac"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                    <state key="normal" title="&lt; Back">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="dismiss:" destination="-1" eventType="touchUpInside" id="dnd-8v-CxB"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
+                <constraint firstItem="yQ6-Ja-qmv" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="6" id="4qA-c1-HRx"/>
+                <constraint firstItem="87l-W7-cUr" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="849-CT-xFF"/>
+                <constraint firstItem="yQ6-Ja-qmv" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="10" id="8gI-kQ-QkO"/>
+                <constraint firstItem="dZM-8x-xI4" firstAttribute="top" secondItem="87l-W7-cUr" secondAttribute="bottom" constant="10" id="BNL-48-5MC"/>
                 <constraint firstAttribute="trailing" secondItem="ngb-uu-RHU" secondAttribute="trailing" id="Fba-lg-w4l"/>
-                <constraint firstAttribute="bottom" relation="lessThanOrEqual" secondItem="87l-W7-cUr" secondAttribute="bottom" priority="250" constant="50" id="JHe-ZS-XY7"/>
                 <constraint firstAttribute="bottom" secondItem="ngb-uu-RHU" secondAttribute="bottom" id="Mmc-d4-OlH"/>
                 <constraint firstItem="dZM-8x-xI4" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="30" id="NV3-S1-GKH"/>
+                <constraint firstItem="87l-W7-cUr" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="XuZ-je-sPB"/>
+                <constraint firstItem="87l-W7-cUr" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="44" id="elc-qt-BSg"/>
                 <constraint firstAttribute="bottom" secondItem="dZM-8x-xI4" secondAttribute="bottom" constant="37" id="fe5-11-ESh"/>
-                <constraint firstAttribute="trailing" secondItem="87l-W7-cUr" secondAttribute="trailing" constant="10" id="h2g-wB-iHy"/>
                 <constraint firstAttribute="trailing" secondItem="dZM-8x-xI4" secondAttribute="trailing" constant="30" id="naa-jo-8jj"/>
                 <constraint firstItem="ngb-uu-RHU" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="qqM-Rh-6rT"/>
-                <constraint firstItem="87l-W7-cUr" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="94" id="rpf-Yw-VyG"/>
-                <constraint firstItem="87l-W7-cUr" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="10" id="tTP-P3-B0I"/>
                 <constraint firstItem="ngb-uu-RHU" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="ymV-gP-lTe"/>
             </constraints>
-            <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+            <nil key="simulatedTopBarMetrics"/>
             <point key="canvasLocation" x="25.5" y="51.5"/>
         </view>
     </objects>
     <resources>
-        <image name="newBG-detailPage" width="540" height="960"/>
+        <image name="anatomyViewBg.png" width="540" height="960"/>
     </resources>
 </document>

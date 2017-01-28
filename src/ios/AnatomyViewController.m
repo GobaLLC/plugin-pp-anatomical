@@ -13,7 +13,11 @@
 #import "NSArray+Addition.h"
 #import "NSDictionary+Addition.h"
 
-@interface AnatomyViewController ()
+@interface AnatomyViewController (){
+    CGPoint _prevPoint;
+}
+
+@property (strong, nonatomic) UIPanGestureRecognizer* panGesture;
 
 @property (weak, nonatomic) IBOutlet UIView *containerView;
 @property (weak, nonatomic) IBOutlet UISlider *frameSlider;
@@ -56,18 +60,22 @@ NSString * const kImageName = @"image.jpg";
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    
+    _prevPoint = self.containerView.center;
     
     CGAffineTransform trans = CGAffineTransformMakeRotation(M_PI_2);
     _layerSlider.transform = trans;
+    
+    self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(rotateItem:)];
+    _panGesture.delegate = self;
+    [self.containerView addGestureRecognizer:_panGesture];
     
 }
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
     
-    UIBarButtonItem *menuItem = [[UIBarButtonItem alloc] initWithTitle:@"Close" style:UIBarButtonItemStylePlain target:self action:@selector(dismiss:)];    
-    [self.navigationItem setLeftBarButtonItem:menuItem];
+    //    UIBarButtonItem *menuItem = [[UIBarButtonItem alloc] initWithTitle:@"Close" style:UIBarButtonItemStylePlain target:self action:@selector(dismiss:)];
+    //    [self.navigationItem setLeftBarButtonItem:menuItem];
     
     self.maleAnatomyImages = [[NSMutableArray alloc] init];
     self.femaleAnatomyImages = [[NSMutableArray alloc] init];
@@ -184,6 +192,26 @@ NSString * const kImageName = @"image.jpg";
     }
 }
 
+- (void) rotateItem:(UIPanGestureRecognizer *)recognizer {
+    CGFloat xTranslation = [recognizer translationInView:recognizer.view].x;
+    CGFloat tolerance = 10.0f;
+
+    if(fabs(xTranslation) >= tolerance){
+        CGFloat newValue = _frameSlider.value + (CGFloat)(xTranslation/tolerance);
+        [_frameSlider setValue:newValue animated:YES];
+        [self updateAnatomyImageFrame];
+        
+        [recognizer setTranslation:CGPointZero inView:recognizer.view];
+    }
+}
+
+- (BOOL) gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)recognizer {
+    
+
+    
+    return YES;
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -260,7 +288,7 @@ NSString * const kImageName = @"image.jpg";
 - (void)addImageViewToLayer: (int)layerLevel frameNum: (int)frameNum {
     NSString *filePath = [@[_folderPath, [NSString stringWithFormat:@"L%02d", layerLevel], @"male", [NSString stringWithFormat:@"%02d", frameNum], kImageName] componentsJoinedByString:@"/"];
     
-    CGRect frame = CGRectMake(0.0, 0.0, _containerView.frame.size.width, _containerView.frame.size.height - 200.0);
+    CGRect frame = CGRectMake(0.0, 0.0, _containerView.frame.size.width, _containerView.frame.size.height - 100.0);
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:frame];
     [imageView setContentMode:UIViewContentModeScaleAspectFit];
     [imageView setClipsToBounds:YES];
@@ -272,13 +300,16 @@ NSString * const kImageName = @"image.jpg";
     [_containerView addSubview:imageView];
 }
 
-- (IBAction)frameSliderValueChanged:(id)sender {
-    //    NSLog(@"slider value %f", _frameSlider.value);
+- (void)updateAnatomyImageFrame {
+     NSLog(@"slider value %f", _frameSlider.value);
     _currentFrame = (int)floor(_frameSlider.value);
     for (int i=(_totalMaleLayers-1); i>=0; i--){
         int visibleFrame;
         if(_currentFrame == _totalAnglesPerMaleLayer){
             visibleFrame = 0;
+        }
+        else if(_currentFrame < 0){
+            visibleFrame = _totalAnglesPerMaleLayer-i;
         }
         else{
             visibleFrame = _currentFrame;
@@ -289,6 +320,11 @@ NSString * const kImageName = @"image.jpg";
         UIImageView *imageView = [self currentAnatomyImageViewWithIndex:i];
         [imageView setImage:image];
     }
+
+}
+
+- (IBAction)frameSliderValueChanged:(id)sender {
+    [self updateAnatomyImageFrame];
 }
 
 - (IBAction)layerSliderValueChanged:(id)sender {
