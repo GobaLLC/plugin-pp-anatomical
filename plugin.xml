@@ -22,23 +22,26 @@
       <feature name="Hello">
         <param name="ios-package" value="HWPHello" />
       </feature>
-    </config-file>    
+    </config-file>
 
-    <header-file src="src/ios/HWPHello.h" target-dir="HelloPlugin"/>
-    <source-file src="src/ios/HWPHello.m" target-dir="HelloPlugin"/>
+    <header-file src="src/ios/HWPHello.h"/>
+    <source-file src="src/ios/HWPHello.m"/>
     <header-file src="src/ios/AnatomyViewController.h" />
     <source-file src="src/ios/AnatomyViewController.m" />
     <resource-file src="src/ios/AnatomyViewController.xib" />
-    <header-file src="src/ios/Model/AnatomyImage.h" />
-    <source-file src="src/ios/Model/AnatomyImage.m" />
-    <header-file src="src/ios/Categories/NSArray+Addition.h" />
-    <source-file src="src/ios/Categories/NSArray+Addition.m" />
-    <header-file src="src/ios/Categories/NSDictionary+Addition.h" />
-    <source-file src="src/ios/Categories/NSDictionary+Addition.m" />
-    <header-file src="src/ios/Categories/NSOperationQueue+Completion.h" />
-    <source-file src="src/ios/Categories/NSOperationQueue+Completion.m" />
-    <header-file src="src/ios/ThirdParty/MBProgressHUD/MBProgressHUD.h" />
-    <source-file src="src/ios/ThirdParty/MBProgressHUD/MBProgressHUD.m" />
+    <header-file src="src/ios/Model/AnatomyImage.h" target-dir="Model" />
+    <source-file src="src/ios/Model/AnatomyImage.m" target-dir="Model" />
+    <header-file src="src/ios/Categories/NSArray+Addition.h" target-dir="Categories" />
+    <source-file src="src/ios/Categories/NSArray+Addition.m" target-dir="Categories" />
+    <header-file src="src/ios/Categories/NSDictionary+Addition.h" target-dir="Categories" />
+    <source-file src="src/ios/Categories/NSDictionary+Addition.m" target-dir="Categories" />
+    <header-file src="src/ios/Categories/NSOperationQueue+Completion.h" target-dir="Categories" />
+    <source-file src="src/ios/Categories/NSOperationQueue+Completion.m" target-dir="Categories" />
+    <header-file src="src/ios/ThirdParty/MBProgressHUD/MBProgressHUD.h" target-dir="ThirdParty/MBProgressHUD" />
+    <source-file src="src/ios/ThirdParty/MBProgressHUD/MBProgressHUD.m" target-dir="ThirdParty/MBProgressHUD" />
+
+    <resource-file src="src/ios/Resources/newBG-detailPage@2x.png" target-dir="Resources" />
+    
   </platform>
 
 </plugin>
