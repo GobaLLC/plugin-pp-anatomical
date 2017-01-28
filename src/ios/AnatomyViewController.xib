@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AnatomyViewController">
+            <connections>
+                <outlet property="containerView" destination="87l-W7-cUr" id="yBG-MU-BVH"/>
+                <outlet property="frameSlider" destination="dZM-8x-xI4" id="QcD-lO-g8j"/>
+                <outlet property="layerSlider" destination="rY7-WY-zWc" id="C1l-Ep-icM"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="newBG-detailPage" translatesAutoresizingMaskIntoConstraints="NO" id="ngb-uu-RHU">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="603"/>
+                </imageView>
+                <view contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="87l-W7-cUr">
+                    <rect key="frame" x="15" y="94" width="344" height="459"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                </view>
+                <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="rY7-WY-zWc">
+                    <rect key="frame" x="-120" y="200" width="300" height="31"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <connections>
+                        <action selector="layerSliderValueChanged:" destination="-1" eventType="valueChanged" id="agk-Kq-Ec5"/>
+                    </connections>
+                </slider>
+                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="dZM-8x-xI4">
+                    <rect key="frame" x="28" y="536" width="319" height="31"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="50O-nn-xq6"/>
+                    </constraints>
+                    <connections>
+                        <action selector="frameSliderValueChanged:" destination="-1" eventType="valueChanged" id="v3x-KI-Xv2"/>
+                    </connections>
+                </slider>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="ngb-uu-RHU" secondAttribute="trailing" id="Fba-lg-w4l"/>
+                <constraint firstAttribute="bottom" relation="lessThanOrEqual" secondItem="87l-W7-cUr" secondAttribute="bottom" priority="250" constant="50" id="JHe-ZS-XY7"/>
+                <constraint firstAttribute="bottom" secondItem="ngb-uu-RHU" secondAttribute="bottom" id="Mmc-d4-OlH"/>
+                <constraint firstItem="dZM-8x-xI4" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="30" id="NV3-S1-GKH"/>
+                <constraint firstAttribute="bottom" secondItem="dZM-8x-xI4" secondAttribute="bottom" constant="37" id="fe5-11-ESh"/>
+                <constraint firstAttribute="trailing" secondItem="87l-W7-cUr" secondAttribute="trailing" constant="10" id="h2g-wB-iHy"/>
+                <constraint firstAttribute="trailing" secondItem="dZM-8x-xI4" secondAttribute="trailing" constant="30" id="naa-jo-8jj"/>
+                <constraint firstItem="ngb-uu-RHU" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="qqM-Rh-6rT"/>
+                <constraint firstItem="87l-W7-cUr" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="94" id="rpf-Yw-VyG"/>
+                <constraint firstItem="87l-W7-cUr" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="10" id="tTP-P3-B0I"/>
+                <constraint firstItem="ngb-uu-RHU" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="ymV-gP-lTe"/>
+            </constraints>
+            <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+            <point key="canvasLocation" x="25.5" y="51.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="newBG-detailPage" width="540" height="960"/>
+    </resources>
+</document>
