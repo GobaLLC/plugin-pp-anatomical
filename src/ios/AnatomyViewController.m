@@ -13,14 +13,14 @@
 #import "NSArray+Addition.h"
 #import "NSDictionary+Addition.h"
 
-@interface AnatomyViewController (){
+@interface AnatomyViewController ()<UIGestureRecognizerDelegate>{
     CGPoint _prevPoint;
 }
 
 @property (strong, nonatomic) UIPanGestureRecognizer* panGesture;
 
 @property (weak, nonatomic) IBOutlet UIView *containerView;
-@property (weak, nonatomic) IBOutlet UISlider *frameSlider;
+//@property (weak, nonatomic) IBOutlet UISlider *frameSlider;
 @property (weak, nonatomic) IBOutlet UISlider *layerSlider;
 
 @property (strong, nonatomic) NSString* fileName;
@@ -55,11 +55,15 @@ NSString * const kMaleAngleKey = @"aAngles1";
 NSString * const kFemaleAngleKey = @"aAngles2";
 NSString * const kImageResolution = @"20";
 NSString * const kImageName = @"image.jpg";
+float kFrameRotationTolerance = 7.0f;
 
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+//    CGRect containerFrame = CGRectMake(0.0, 54.0, _containerView.frame.size.width, _containerView.frame.size.width);
+//    [_containerView setFrame:containerFrame];
+    
     _prevPoint = self.containerView.center;
     
     CGAffineTransform trans = CGAffineTransformMakeRotation(M_PI_2);
@@ -84,10 +88,6 @@ NSString * const kImageName = @"image.jpg";
     self.fileName = @"m_brain";
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     self.folderPath = [[paths objectAtIndex:0] stringByAppendingPathComponent:self.folderName];
-    
-    
-    _currentLayer = 1;
-    _currentFrame = 1;
     
     //    http://s3.amazonaws.com/goba_dev/y8yIRUIUcynOjK/iyjyusqDMofjt3/Angle/10/m_brain_L03_17.jpg
     
@@ -194,12 +194,10 @@ NSString * const kImageName = @"image.jpg";
 
 - (void) rotateItem:(UIPanGestureRecognizer *)recognizer {
     CGFloat xTranslation = [recognizer translationInView:recognizer.view].x;
-    CGFloat tolerance = 10.0f;
-
-    if(fabs(xTranslation) >= tolerance){
-        CGFloat newValue = _frameSlider.value + (CGFloat)(xTranslation/tolerance);
-        [_frameSlider setValue:newValue animated:YES];
-        [self updateAnatomyImageFrame];
+    
+    if(fabs(xTranslation) >= kFrameRotationTolerance){
+        CGFloat nextFrame = _currentFrame - (CGFloat)(xTranslation / kFrameRotationTolerance);
+        [self updateAnatomyImageFrame:(int)nextFrame];
         
         [recognizer setTranslation:CGPointZero inView:recognizer.view];
     }
@@ -207,7 +205,7 @@ NSString * const kImageName = @"image.jpg";
 
 - (BOOL) gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)recognizer {
     
-
+    
     
     return YES;
 }
@@ -243,10 +241,8 @@ NSString * const kImageName = @"image.jpg";
                 _numberOfImagesLoaded++;
                 
                 float progress = ((_numberOfImagesLoaded/_totalImagesToDownload) * 1.0f);
-                NSLog(@"Progress: %f/%f = %f", _numberOfImagesLoaded, _totalImagesToDownload, progress);
+//                NSLog(@"Progress: %f/%f = %f", _numberOfImagesLoaded, _totalImagesToDownload, progress);
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    // Instead we could have also passed a reference to the HUD
-                    // to the HUD to myProgressTask as a method parameter.
                     _hud.progress = progress;
                 });
             }];
@@ -254,13 +250,13 @@ NSString * const kImageName = @"image.jpg";
     }
     
     [downloadQueue setCompletion:^{
-        NSLog(@"finished downloading files");
+//        NSLog(@"finished downloading files");
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         
         NSArray *filePathsArray = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:documentsDirectory  error:nil];
         
-        NSLog(@"files array %@", filePathsArray);
+//        NSLog(@"files array %@", filePathsArray);
         
         [self setupLevels];
         
@@ -276,13 +272,16 @@ NSString * const kImageName = @"image.jpg";
     _layerSlider.maximumValue = self.totalMaleLayers - 1;
     _layerSlider.value = 0.0f;
     
-    _frameSlider.minimumValue = 0.0f;
-    _frameSlider.maximumValue = self.totalAnglesPerMaleLayer;
-    _frameSlider.value = 0.0f;
+    _currentLayer = 0;
+    _currentFrame = 0;
     
     for (int i=(_totalMaleLayers-1); i>=0; i--){
-        [self addImageViewToLayer:i frameNum:0];
+        [self addImageViewToLayer:i frameNum:_currentFrame];
     }
+}
+
+- (float)adjustedFrame:(float)frame {
+    return frame - self.totalAnglesPerMaleLayer/2.0;
 }
 
 - (void)addImageViewToLayer: (int)layerLevel frameNum: (int)frameNum {
@@ -300,31 +299,26 @@ NSString * const kImageName = @"image.jpg";
     [_containerView addSubview:imageView];
 }
 
-- (void)updateAnatomyImageFrame {
-     NSLog(@"slider value %f", _frameSlider.value);
-    _currentFrame = (int)floor(_frameSlider.value);
+- (void)updateAnatomyImageFrame:(int)nextFrame {
     for (int i=(_totalMaleLayers-1); i>=0; i--){
-        int visibleFrame;
-        if(_currentFrame == _totalAnglesPerMaleLayer){
-            visibleFrame = 0;
+        if(nextFrame >= _totalAnglesPerMaleLayer){
+            _currentFrame = 0;
         }
-        else if(_currentFrame < 0){
-            visibleFrame = _totalAnglesPerMaleLayer-i;
+        else if(nextFrame < 0){
+            _currentFrame = _totalAnglesPerMaleLayer-1;
         }
         else{
-            visibleFrame = _currentFrame;
+            _currentFrame = nextFrame;
         }
         
-        NSString *filePath = [@[_folderPath, [NSString stringWithFormat:@"L%02d", i], @"male", [NSString stringWithFormat:@"%02d", visibleFrame], kImageName] componentsJoinedByString:@"/"];
+//        NSLog(@"current frame %d,   nextIndex: %d", _currentFrame, nextFrame);
+        
+        NSString *filePath = [@[_folderPath, [NSString stringWithFormat:@"L%02d", i], @"male", [NSString stringWithFormat:@"%02d", _currentFrame], kImageName] componentsJoinedByString:@"/"];
         UIImage *image = [UIImage imageWithContentsOfFile:filePath];
         UIImageView *imageView = [self currentAnatomyImageViewWithIndex:i];
         [imageView setImage:image];
     }
-
-}
-
-- (IBAction)frameSliderValueChanged:(id)sender {
-    [self updateAnatomyImageFrame];
+    
 }
 
 - (IBAction)layerSliderValueChanged:(id)sender {
@@ -341,21 +335,5 @@ NSString * const kImageName = @"image.jpg";
     return (UIImageView*)[self.containerView viewWithTag:(index+1)];
 }
 
-- (float)keepBetweenLow:(int)low hi:(int)hi num:(int)num {
-    if (num < low) return (low);
-    else if (num > hi) return (hi);
-    else return (num);
-}
-
-
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
 
 @end

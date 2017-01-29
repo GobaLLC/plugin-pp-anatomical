@@ -12,7 +12,6 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AnatomyViewController">
             <connections>
                 <outlet property="containerView" destination="87l-W7-cUr" id="yBG-MU-BVH"/>
-                <outlet property="frameSlider" destination="dZM-8x-xI4" id="QcD-lO-g8j"/>
                 <outlet property="layerSlider" destination="rY7-WY-zWc" id="C1l-Ep-icM"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -36,14 +35,11 @@
                         <action selector="layerSliderValueChanged:" destination="-1" eventType="valueChanged" id="agk-Kq-Ec5"/>
                     </connections>
                 </slider>
-                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="dZM-8x-xI4">
+                <slider opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="dZM-8x-xI4">
                     <rect key="frame" x="28" y="600" width="319" height="31"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="30" id="50O-nn-xq6"/>
                     </constraints>
-                    <connections>
-                        <action selector="frameSliderValueChanged:" destination="-1" eventType="valueChanged" id="v3x-KI-Xv2"/>
-                    </connections>
                 </slider>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yQ6-Ja-qmv">
                     <rect key="frame" x="10" y="6" width="60" height="44"/>
