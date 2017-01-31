@@ -5,10 +5,10 @@
 
 - (void)presentAnatomyView:(CDVInvokedUrlCommand*)command
 {
-    NSString* jsonDataString = [[command arguments] objectAtIndex:0];
+    NSDictionary* jsonData = [[command arguments] objectAtIndex:0];
 
     AnatomyViewController *anatomyViewController = [[AnatomyViewController alloc] init];
-    anatomyViewController.jsonDataString = jsonDataString;
+    anatomyViewController.jsonData = jsonData;
 //    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:anatomyViewController];
     [self.viewController presentViewController:anatomyViewController animated:YES completion:nil];
 

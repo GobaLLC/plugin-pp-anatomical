@@ -14,6 +14,6 @@
     MBProgressHUD *_hud;
 }
 
-@property (strong, nonatomic) NSString* jsonDataString;
+@property (strong, nonatomic) NSDictionary* jsonData;
 
 @end

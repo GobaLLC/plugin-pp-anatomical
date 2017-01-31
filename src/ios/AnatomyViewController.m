@@ -95,8 +95,8 @@ float kFrameRotationTolerance = 7.0f;
     _hud.mode = MBProgressHUDModeDeterminateHorizontalBar;
     _hud.label.text = @"Loading...";
     
-    NSDictionary *jsonData = [NSJSONSerialization JSONObjectWithData:[_jsonDataString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:nil];
-    [self parseAnatomyData: jsonData];
+//    NSDictionary *jsonData = [NSJSONSerialization JSONObjectWithData:[_jsonDataString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:nil];
+    [self parseAnatomyData: self.jsonData];
     
     
     self.totalImagesToDownload = self.maleAnatomyImages.count + self.femaleAnatomyImages.count;
