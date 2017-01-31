@@ -11,7 +11,7 @@ Create a new Cordova Project
 Install the plugin
 
     $ cd anatomicalplugin
-    $ cordova plugin add https://goballc.git.beanstalkapp.com/pp-anatomical-plugin.git
+    $ cordova plugin add https://github.com/GobaLLC/pp-anatomical-plugin.git
 
 
 Edit `www/js/index.js` and add the following code inside `onDeviceReady`
