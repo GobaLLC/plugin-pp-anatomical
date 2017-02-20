@@ -15,15 +15,38 @@
 
 @interface AnatomyViewController ()<UIGestureRecognizerDelegate>{
     CGPoint _prevPoint;
+    BOOL _showOneGender;
+    
+    int _totalMaleLayers;
+    int _totalAnglesPerMaleLayer;
+    int _currentMaleFrame;
+    int _currentMaleLayer;
+    float _currentMaleLayerValue;
+    
+    int _totalFemaleLayers;
+    int _totalAnglesPerFemaleLayer;
+    int _currentFemaleFrame;
+    int _currentFemaleLayer;
+    float _currentFemaleLayerValue;
+    
+    int _totalLayers;
+    int _totalAngles;
+    int _currentFrame;
+    int _currentLayer;
+    float _currentLayerValue;
+    
+    float _numberOfImagesLoaded;
+    float _totalImagesToDownload;
 }
 
 @property (strong, nonatomic) UIPanGestureRecognizer* panGesture;
 
 @property (weak, nonatomic) IBOutlet UIView *containerView;
-//@property (weak, nonatomic) IBOutlet UISlider *frameSlider;
-@property (weak, nonatomic) IBOutlet UISlider *layerSlider;
+@property (weak, nonatomic) IBOutlet UILabel *anatomyLabel;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *genderSegmentedControl;
 
-@property (strong, nonatomic) NSString* fileName;
+@property (strong, nonatomic) NSString* anatomyName;
+@property (strong, nonatomic) NSString* anatomyIdentifier;
 @property (strong, nonatomic) NSString* folderName;
 @property (strong, nonatomic) NSString* imagePath;
 @property (strong, nonatomic) NSString* folderPath;
@@ -31,43 +54,41 @@
 @property (strong, nonatomic) NSMutableArray *maleAnatomyImages;
 @property (strong, nonatomic) NSMutableArray *femaleAnatomyImages;
 
-@property (assign, nonatomic) int currentFrame;
-@property (assign, nonatomic) int currentLayer;
-@property (assign, nonatomic) float currentLayerValue;
-
-@property (assign, nonatomic) int totalMaleLayers;
-@property (assign, nonatomic) int totalAnglesPerMaleLayer;
-
-@property (assign, nonatomic) int totalFemaleLayers;
-@property (assign, nonatomic) int totalAnglesPerFemaleLayer;
-
-
-@property (assign, nonatomic) float numberOfImagesLoaded;
-@property (assign, nonatomic) float totalImagesToDownload;
-
+@property (strong, nonatomic) NSString* currentGender;
+@property (strong, nonatomic) NSString* imageResolution;
 
 @end
 
 @implementation AnatomyViewController
 
 NSString * const kLayersKey = @"aLayers";
-NSString * const kMaleAngleKey = @"aAngles1";
-NSString * const kFemaleAngleKey = @"aAngles2";
-NSString * const kImageResolution = @"20";
+NSString * const kAnglesKey = @"aAngles";
 NSString * const kImageName = @"image.jpg";
 float kFrameRotationTolerance = 7.0f;
+float kLayerTransitionTolerance = 10.0f;
 
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-//    CGRect containerFrame = CGRectMake(0.0, 54.0, _containerView.frame.size.width, _containerView.frame.size.width);
-//    [_containerView setFrame:containerFrame];
-    
     _prevPoint = self.containerView.center;
     
-    CGAffineTransform trans = CGAffineTransformMakeRotation(M_PI_2);
-    _layerSlider.transform = trans;
+    _currentLayerValue = 0.0f;
+    _currentLayer = 0;
+    _currentFrame = 0;
+    
+    NSLog(@"%f", [[UIScreen mainScreen] bounds].size.height);
+    
+    if([[UIScreen mainScreen] bounds].size.height > 568.0)
+        self.imageResolution = @"30";
+    else
+        self.imageResolution = @"20";
+    
+    //    CGAffineTransform trans = CGAffineTransformMakeRotation(M_PI_2);
+    //    _layerSlider.transform = trans;
+    //    _layerSlider.hidden = YES;
+    
+    _containerView.layer.borderWidth = 2.0f;
+    _containerView.layer.borderColor = [UIColor darkGrayColor].CGColor;
     
     self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(rotateItem:)];
     _panGesture.delegate = self;
@@ -84,8 +105,12 @@ float kFrameRotationTolerance = 7.0f;
     self.maleAnatomyImages = [[NSMutableArray alloc] init];
     self.femaleAnatomyImages = [[NSMutableArray alloc] init];
     
-    self.folderName = @"mBrain";
-    self.fileName = @"m_brain";
+    self.anatomyName = [self.jsonData objectForKey:@"sTitle" or:nil];
+    self.anatomyIdentifier = [NSString stringWithFormat:@"%d", [[self.jsonData objectForKey:@"nID" or:nil] intValue]];
+    
+    self.anatomyLabel.text = _anatomyName;
+    
+    self.folderName = _anatomyIdentifier;
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     self.folderPath = [[paths objectAtIndex:0] stringByAppendingPathComponent:self.folderName];
     
@@ -95,11 +120,9 @@ float kFrameRotationTolerance = 7.0f;
     _hud.mode = MBProgressHUDModeDeterminateHorizontalBar;
     _hud.label.text = @"Loading...";
     
-//    NSDictionary *jsonData = [NSJSONSerialization JSONObjectWithData:[_jsonDataString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:nil];
     [self parseAnatomyData: self.jsonData];
     
-    
-    self.totalImagesToDownload = self.maleAnatomyImages.count + self.femaleAnatomyImages.count;
+    _totalImagesToDownload = self.maleAnatomyImages.count + self.femaleAnatomyImages.count;
     
     NSMutableArray *anatomyImagesToDownload = [NSMutableArray array];
     [anatomyImagesToDownload addObjectsFromArray:self.maleAnatomyImages];
@@ -112,11 +135,11 @@ float kFrameRotationTolerance = 7.0f;
 }
 
 - (void)parseAnatomyData:(NSDictionary*)json {
-    self.totalMaleLayers = 0;
-    self.totalAnglesPerMaleLayer = 0;
+    _totalMaleLayers = 0;
+    _totalAnglesPerMaleLayer = 0;
     
-    self.totalFemaleLayers = 0;
-    self.totalAnglesPerFemaleLayer = 0;
+    _totalFemaleLayers = 0;
+    _totalAnglesPerFemaleLayer = 0;
     
     
     int layerIndex = 0;
@@ -131,27 +154,30 @@ float kFrameRotationTolerance = 7.0f;
         NSString *layerFolderName = [NSString stringWithFormat:@"%@/L%02d",_folderName, layerIndex];
         
         int angleIndex = 0;
-        NSArray *aAngles1 = [layerObj objectForKey:kMaleAngleKey or:nil];
+        NSString *maleJsonKey = [NSString stringWithFormat:@"%@%d", kAnglesKey, AnatomyGenderMale];
+        NSArray *aAngles1 = [layerObj objectForKey:maleJsonKey or:nil];
         if([aAngles1 count] == 0){
             NSLog(@"ERROR: No angle data is present at Male layer %d", layerIndex);
         }
         
         for(NSDictionary *angleObj in aAngles1){
             NSString *angleFolderName = [NSString stringWithFormat:@"%@/male/%02d", layerFolderName, angleIndex];
-            NSDictionary *angleResolutionObj = [angleObj objectForKey:kImageResolution or:nil];
+            NSDictionary *angleResolutionObj = [angleObj objectForKey:_imageResolution or:nil];
             AnatomyImage *anatomyImage = [[AnatomyImage alloc] initWithDictionary:angleResolutionObj folderPath:angleFolderName layerLevel:layerIndex angleNumber:angleIndex];
             [self.maleAnatomyImages addObject:anatomyImage];
             angleIndex++;
         }
         if(angleIndex > 0){
             if(_totalAnglesPerMaleLayer > 0)
-                self.totalAnglesPerMaleLayer = MIN(_totalAnglesPerMaleLayer, angleIndex);
+                _totalAnglesPerMaleLayer = MIN(_totalAnglesPerMaleLayer, angleIndex);
             else
-                self.totalAnglesPerMaleLayer = angleIndex;
+                _totalAnglesPerMaleLayer = angleIndex;
+            
+            _totalMaleLayers++;
         }
         
-        
-        NSArray *aAngles2 = [layerObj objectForKey:@"aAngles2" or:nil];
+        NSString *femaleJsonKey = [NSString stringWithFormat:@"%@%d", kAnglesKey, AnatomyGenderFemale];
+        NSArray *aAngles2 = [layerObj objectForKey:femaleJsonKey or:nil];
         if([aAngles2 count] == 0){
             NSLog(@"ERROR: No angle data is present at Female layer %d", layerIndex);
         }
@@ -159,41 +185,27 @@ float kFrameRotationTolerance = 7.0f;
         angleIndex = 0;
         for(NSDictionary *angleObj in aAngles2){
             NSString *angleFolderName = [NSString stringWithFormat:@"%@/female/%02d", layerFolderName, angleIndex];
-            NSDictionary *angleResolutionObj = [angleObj objectForKey:kImageResolution or:nil];
+            NSDictionary *angleResolutionObj = [angleObj objectForKey:_imageResolution or:nil];
             AnatomyImage *anatomyImage = [[AnatomyImage alloc] initWithDictionary:angleResolutionObj folderPath:angleFolderName layerLevel:layerIndex angleNumber:angleIndex];
             [self.femaleAnatomyImages addObject:anatomyImage];
             angleIndex++;
         }
         if(angleIndex > 0){
             if(_totalAnglesPerFemaleLayer > 0)
-                self.totalAnglesPerFemaleLayer = MIN(_totalAnglesPerFemaleLayer, angleIndex);
+                _totalAnglesPerFemaleLayer = MIN(_totalAnglesPerFemaleLayer, angleIndex);
             else
-                self.totalAnglesPerFemaleLayer = angleIndex;
-        }
-        
-        //We'll just call this the top layer since there are no angle images here
-        if(aAngles1.count == 0 && aAngles2.count == 0){
-            break;
+                _totalAnglesPerFemaleLayer = angleIndex;
+            
+            _totalFemaleLayers++;
         }
         
         layerIndex++;
-    }
-    
-    if(layerIndex > 0){
-        if(_totalMaleLayers > 0)
-            self.totalMaleLayers = MIN(_totalMaleLayers, layerIndex);
-        else
-            self.totalMaleLayers = layerIndex;
-        
-        if(_totalFemaleLayers > 0)
-            self.totalFemaleLayers = MIN(_totalFemaleLayers, layerIndex);
-        else
-            self.totalFemaleLayers = layerIndex;
     }
 }
 
 - (void) rotateItem:(UIPanGestureRecognizer *)recognizer {
     CGFloat xTranslation = [recognizer translationInView:recognizer.view].x;
+    CGFloat yTranslation = [recognizer translationInView:recognizer.view].y;
     
     if(fabs(xTranslation) >= kFrameRotationTolerance){
         CGFloat nextFrame = _currentFrame - (CGFloat)(xTranslation / kFrameRotationTolerance);
@@ -201,12 +213,25 @@ float kFrameRotationTolerance = 7.0f;
         
         [recognizer setTranslation:CGPointZero inView:recognizer.view];
     }
+    
+    if(fabs(yTranslation) >= kLayerTransitionTolerance){
+        _currentLayerValue = _currentLayerValue + (CGFloat)((yTranslation / kLayerTransitionTolerance)*0.1);
+        _currentLayerValue = fmax(_currentLayerValue, 0.0f);
+        _currentLayerValue = fmin(_currentLayerValue, _totalLayers);
+        _currentLayer = (int)floor(_currentLayerValue);
+        
+        if(_currentLayer != (_totalLayers - 1)){
+            int nextLayer = fmin(_currentLayer+1, _totalAngles);
+            UIImageView *currentImageView = [self currentAnatomyImageViewWithIndex:_currentLayer];
+            float alpha = nextLayer - _currentLayerValue;
+            currentImageView.alpha = alpha;
+        }
+        
+        [recognizer setTranslation:CGPointZero inView:recognizer.view];
+    }
 }
 
 - (BOOL) gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)recognizer {
-    
-    
-    
     return YES;
 }
 
@@ -241,7 +266,7 @@ float kFrameRotationTolerance = 7.0f;
                 _numberOfImagesLoaded++;
                 
                 float progress = ((_numberOfImagesLoaded/_totalImagesToDownload) * 1.0f);
-//                NSLog(@"Progress: %f/%f = %f", _numberOfImagesLoaded, _totalImagesToDownload, progress);
+                //                NSLog(@"Progress: %f/%f = %f", _numberOfImagesLoaded, _totalImagesToDownload, progress);
                 dispatch_async(dispatch_get_main_queue(), ^{
                     _hud.progress = progress;
                 });
@@ -250,17 +275,8 @@ float kFrameRotationTolerance = 7.0f;
     }
     
     [downloadQueue setCompletion:^{
-//        NSLog(@"finished downloading files");
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *documentsDirectory = [paths objectAtIndex:0];
-        
-        NSArray *filePathsArray = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:documentsDirectory  error:nil];
-        
-//        NSLog(@"files array %@", filePathsArray);
-        
-        [self setupLevels];
-        
         dispatch_async(dispatch_get_main_queue(), ^{
+            [self setupLevels];
             [_hud hideAnimated:YES];
         });
     }];
@@ -268,67 +284,104 @@ float kFrameRotationTolerance = 7.0f;
 }
 
 - (void)setupLevels{
-    _layerSlider.minimumValue = 0.0f;
-    _layerSlider.maximumValue = self.totalMaleLayers - 1;
-    _layerSlider.value = 0.0f;
+    //    _layerSlider.minimumValue = 0.0f;
+    //    _layerSlider.maximumValue = self.totalMaleLayers - 1;
+    //    _layerSlider.value = 0.0f;
+    if((_totalMaleLayers == 0 && _totalFemaleLayers > 0) ||
+       (_totalMaleLayers > 0 && _totalFemaleLayers == 0))
+    {
+        _showOneGender = YES;
+        _genderSegmentedControl.hidden = YES;
+    }
+    else{
+        _showOneGender = NO;
+        _genderSegmentedControl.hidden = NO;
+    }
     
+    
+    [[self.containerView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    
+    if(_genderSegmentedControl.selectedSegmentIndex == (AnatomyGenderMale-1)){
+        self.currentGender = @"male";
+        _totalLayers = _totalMaleLayers;
+        _totalAngles = _totalAnglesPerMaleLayer;
+        
+        _currentFemaleLayer = _currentLayer;
+        _currentFemaleFrame = _currentFrame;
+        _currentFemaleLayerValue = _currentLayerValue;
+        
+        _currentLayer = _currentMaleLayer;
+        _currentFrame = _currentMaleFrame;
+        _currentLayerValue = _currentMaleLayerValue;
+    }
+    else{
+        self.currentGender = @"female";
+        _totalLayers = _totalFemaleLayers;
+        _totalAngles = _totalAnglesPerFemaleLayer;
+        
+        _currentMaleLayer = _currentLayer;
+        _currentMaleFrame = _currentFrame;
+        _currentMaleLayerValue = _currentLayerValue;
+        
+        _currentLayer = _currentFemaleLayer;
+        _currentFrame = _currentFemaleFrame;
+        _currentLayerValue = _currentFemaleLayerValue;
+    }
+    
+    //     NSLog(@"currentLayer %d _currentLayerValue %f", _currentLayer, _currentLayerValue);
+    
+    _currentLayerValue = 0.0f;
     _currentLayer = 0;
     _currentFrame = 0;
     
-    for (int i=(_totalMaleLayers-1); i>=0; i--){
+    for (int i=(_totalLayers-1); i>=0; i--){
         [self addImageViewToLayer:i frameNum:_currentFrame];
     }
 }
 
-- (float)adjustedFrame:(float)frame {
-    return frame - self.totalAnglesPerMaleLayer/2.0;
-}
-
 - (void)addImageViewToLayer: (int)layerLevel frameNum: (int)frameNum {
-    NSString *filePath = [@[_folderPath, [NSString stringWithFormat:@"L%02d", layerLevel], @"male", [NSString stringWithFormat:@"%02d", frameNum], kImageName] componentsJoinedByString:@"/"];
+    int nextLayer = fmin(_currentLayer+1, _totalAngles);
     
-    CGRect frame = CGRectMake(0.0, 0.0, _containerView.frame.size.width, _containerView.frame.size.height - 100.0);
+    NSString *filePath = [@[_folderPath, [NSString stringWithFormat:@"L%02d", layerLevel], _currentGender, [NSString stringWithFormat:@"%02d", frameNum], kImageName] componentsJoinedByString:@"/"];
+    UIImage *image = [UIImage imageWithContentsOfFile:filePath];
+    
+    CGRect frame = CGRectMake(0.0, 0.0, _containerView.frame.size.width, _containerView.frame.size.width);
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:frame];
     [imageView setContentMode:UIViewContentModeScaleAspectFit];
     [imageView setClipsToBounds:YES];
-    
-    UIImage *image = [UIImage imageWithContentsOfFile:filePath];
     [imageView setImage:image];
-    [imageView setAlpha:1.0];
     [imageView setTag:(layerLevel+1)];
+    if(_currentLayer == layerLevel){
+        float alpha = nextLayer - _currentLayerValue;
+        [imageView setAlpha:alpha];
+    }
+    else
+        [imageView setAlpha:1.0];
+    
     [_containerView addSubview:imageView];
 }
 
 - (void)updateAnatomyImageFrame:(int)nextFrame {
-    for (int i=(_totalMaleLayers-1); i>=0; i--){
-        if(nextFrame >= _totalAnglesPerMaleLayer){
+    
+    for (int i=(_totalLayers-1); i>=0; i--){
+        if(nextFrame >= _totalAngles)
             _currentFrame = 0;
-        }
-        else if(nextFrame < 0){
-            _currentFrame = _totalAnglesPerMaleLayer-1;
-        }
-        else{
+        else if(nextFrame < 0)
+            _currentFrame = _totalAngles-1;
+        else
             _currentFrame = nextFrame;
-        }
         
-//        NSLog(@"current frame %d,   nextIndex: %d", _currentFrame, nextFrame);
+        //        NSLog(@"current frame %d,   nextIndex: %d", _currentFrame, nextFrame);
         
-        NSString *filePath = [@[_folderPath, [NSString stringWithFormat:@"L%02d", i], @"male", [NSString stringWithFormat:@"%02d", _currentFrame], kImageName] componentsJoinedByString:@"/"];
+        NSString *filePath = [@[_folderPath, [NSString stringWithFormat:@"L%02d", i], _currentGender, [NSString stringWithFormat:@"%02d", _currentFrame], kImageName] componentsJoinedByString:@"/"];
         UIImage *image = [UIImage imageWithContentsOfFile:filePath];
         UIImageView *imageView = [self currentAnatomyImageViewWithIndex:i];
         [imageView setImage:image];
     }
-    
 }
 
-- (IBAction)layerSliderValueChanged:(id)sender {
-    _currentLayer = (int)floor(_layerSlider.value);
-    
-    if(_currentLayer != (_totalMaleLayers - 1)){
-        int nextLayer = fmin(_currentLayer+1, _totalAnglesPerMaleLayer);
-        UIImageView *currentImageView = [self currentAnatomyImageViewWithIndex:_currentLayer];
-        currentImageView.alpha = nextLayer - _layerSlider.value;
-    }
+- (IBAction)selectedGenderChanged:(id)sender {
+    [self setupLevels];
 }
 
 - (UIImageView*)currentAnatomyImageViewWithIndex:(NSInteger)index{

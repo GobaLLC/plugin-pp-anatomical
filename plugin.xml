@@ -40,8 +40,9 @@
     <header-file src="src/ios/ThirdParty/MBProgressHUD/MBProgressHUD.h" target-dir="ThirdParty/MBProgressHUD" />
     <source-file src="src/ios/ThirdParty/MBProgressHUD/MBProgressHUD.m" target-dir="ThirdParty/MBProgressHUD" />
 
-    <resource-file src="src/ios/Resources/anatomyViewBg.png"  />
-    <resource-file src="src/ios/Resources/anatomyViewBg@2x.png" />
+    <resource-file src="src/ios/Resources/pan_icon.png"  />
+    <resource-file src="src/ios/Resources/pan_icon@2x.png"  />
+    <resource-file src="src/ios/Resources/pan_icon@3x.png"  />
 
   </platform>
 
