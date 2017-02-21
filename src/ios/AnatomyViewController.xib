@@ -13,7 +13,7 @@
             <connections>
                 <outlet property="anatomyLabel" destination="7k7-7v-KFN" id="XxC-nK-YIh"/>
                 <outlet property="containerView" destination="87l-W7-cUr" id="yBG-MU-BVH"/>
-                <outlet property="genderSegmentedControl" destination="IgU-nF-3n8" id="c7D-1Y-loB"/>
+                <outlet property="genderButton" destination="b9G-Q8-A6s" id="S1l-Hr-W44"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -23,12 +23,8 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="87l-W7-cUr">
-                    <rect key="frame" x="10" y="64" width="300" height="300"/>
+                    <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="300" id="MTf-3e-JGp"/>
-                        <constraint firstAttribute="height" constant="300" id="lO6-f5-ELK"/>
-                    </constraints>
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7k7-7v-KFN">
                     <rect key="frame" x="10" y="54" width="300" height="0.0"/>
@@ -62,32 +58,54 @@
                     </connections>
                 </segmentedControl>
                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="pan_icon" translatesAutoresizingMaskIntoConstraints="NO" id="5V7-pt-lK6">
-                    <rect key="frame" x="14" y="325" width="21" height="34"/>
+                    <rect key="frame" x="10" y="524" width="21" height="34"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="34" id="QJh-p6-Mk3"/>
                         <constraint firstAttribute="width" constant="21" id="cVc-nv-jpH"/>
                     </constraints>
                 </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b9G-Q8-A6s">
+                    <rect key="frame" x="271" y="15" width="44" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="44" id="IEX-id-89N"/>
+                        <constraint firstAttribute="width" constant="44" id="gaX-0k-NJn"/>
+                    </constraints>
+                    <color key="tintColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                    <state key="normal" image="icon_female"/>
+                    <connections>
+                        <action selector="genderButtonPressed:" destination="-1" eventType="touchUpInside" id="axD-Tm-Uld"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstItem="5V7-pt-lK6" firstAttribute="top" secondItem="87l-W7-cUr" secondAttribute="bottom" constant="-39" id="0DX-fX-kcM"/>
                 <constraint firstItem="yQ6-Ja-qmv" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="15" id="4qA-c1-HRx"/>
+                <constraint firstAttribute="bottom" secondItem="5V7-pt-lK6" secondAttribute="bottom" constant="10" id="7VR-GS-1Lg"/>
                 <constraint firstItem="yQ6-Ja-qmv" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="8gI-kQ-QkO"/>
+                <constraint firstAttribute="trailing" secondItem="87l-W7-cUr" secondAttribute="trailing" id="9TY-jI-fnk"/>
+                <constraint firstItem="87l-W7-cUr" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="ATw-IB-RV9"/>
                 <constraint firstItem="87l-W7-cUr" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="FZ1-J2-qtX"/>
                 <constraint firstAttribute="trailing" secondItem="7k7-7v-KFN" secondAttribute="trailing" constant="10" id="GB0-7a-vmj"/>
                 <constraint firstItem="7k7-7v-KFN" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="54" id="HNT-BR-eKI"/>
-                <constraint firstItem="IgU-nF-3n8" firstAttribute="top" secondItem="87l-W7-cUr" secondAttribute="bottom" constant="20" id="J8d-qs-joY"/>
+                <constraint firstItem="b9G-Q8-A6s" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="15" id="Obu-oS-rE4"/>
                 <constraint firstItem="IgU-nF-3n8" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="TDf-zG-rEQ"/>
-                <constraint firstItem="87l-W7-cUr" firstAttribute="leading" secondItem="5V7-pt-lK6" secondAttribute="trailing" constant="-25" id="TFy-8M-pnU"/>
+                <constraint firstItem="5V7-pt-lK6" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="10" id="YG7-90-Myg"/>
                 <constraint firstItem="7k7-7v-KFN" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="10" id="YfR-XZ-Vk9"/>
                 <constraint firstItem="87l-W7-cUr" firstAttribute="top" secondItem="7k7-7v-KFN" secondAttribute="bottom" constant="10" id="cvf-tw-SFy"/>
+                <constraint firstAttribute="trailing" secondItem="b9G-Q8-A6s" secondAttribute="trailing" constant="5" id="e3d-rx-IG3"/>
+                <constraint firstAttribute="bottom" secondItem="87l-W7-cUr" secondAttribute="bottom" id="q8O-wZ-Ty4"/>
             </constraints>
             <nil key="simulatedTopBarMetrics"/>
-            <point key="canvasLocation" x="25.5" y="51.5"/>
+            <variation key="default">
+                <mask key="subviews">
+                    <exclude reference="IgU-nF-3n8"/>
+                </mask>
+            </variation>
+            <point key="canvasLocation" x="25" y="51"/>
         </view>
     </objects>
     <resources>
+        <image name="icon_female" width="26" height="30"/>
         <image name="pan_icon" width="21" height="34"/>
     </resources>
 </document>

@@ -43,6 +43,12 @@
     <resource-file src="src/ios/Resources/pan_icon.png"  />
     <resource-file src="src/ios/Resources/pan_icon@2x.png"  />
     <resource-file src="src/ios/Resources/pan_icon@3x.png"  />
+    <resource-file src="src/ios/Resources/icon_female.png"  />
+    <resource-file src="src/ios/Resources/icon_female@2x.png"  />
+    <resource-file src="src/ios/Resources/icon_female@3x.png"  />
+    <resource-file src="src/ios/Resources/icon_male.png"  />
+    <resource-file src="src/ios/Resources/icon_male@2x.png"  />
+    <resource-file src="src/ios/Resources/icon_male@3x.png"  />
 
   </platform>
 

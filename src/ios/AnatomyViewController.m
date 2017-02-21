@@ -37,13 +37,16 @@
     
     float _numberOfImagesLoaded;
     float _totalImagesToDownload;
+    
+    AnatomyGender _selectedGender;
 }
 
 @property (strong, nonatomic) UIPanGestureRecognizer* panGesture;
 
 @property (weak, nonatomic) IBOutlet UIView *containerView;
 @property (weak, nonatomic) IBOutlet UILabel *anatomyLabel;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *genderSegmentedControl;
+//@property (weak, nonatomic) IBOutlet UISegmentedControl *genderSegmentedControl;
+@property (weak, nonatomic) IBOutlet UIButton *genderButton;
 
 @property (strong, nonatomic) NSString* anatomyName;
 @property (strong, nonatomic) NSString* anatomyIdentifier;
@@ -76,6 +79,8 @@ float kLayerTransitionTolerance = 10.0f;
     _currentLayer = 0;
     _currentFrame = 0;
     
+    _selectedGender = AnatomyGenderFemale;
+    
     NSLog(@"%f", [[UIScreen mainScreen] bounds].size.height);
     
     if([[UIScreen mainScreen] bounds].size.height > 568.0)
@@ -87,8 +92,8 @@ float kLayerTransitionTolerance = 10.0f;
     //    _layerSlider.transform = trans;
     //    _layerSlider.hidden = YES;
     
-    _containerView.layer.borderWidth = 2.0f;
-    _containerView.layer.borderColor = [UIColor darkGrayColor].CGColor;
+    //_containerView.layer.borderWidth = 2.0f;
+    //_containerView.layer.borderColor = [UIColor darkGrayColor].CGColor;
     
     self.panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(rotateItem:)];
     _panGesture.delegate = self;
@@ -132,6 +137,19 @@ float kLayerTransitionTolerance = 10.0f;
 
 - (IBAction)dismiss:(id)sender{
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (IBAction)genderButtonPressed:(id)sender{
+    if(_selectedGender == AnatomyGenderFemale){
+        _selectedGender = AnatomyGenderMale;
+        [_genderButton setImage:[UIImage imageNamed:@"icon_male"] forState:UIControlStateNormal];
+    }
+    else{
+        _selectedGender = AnatomyGenderFemale;
+        [_genderButton setImage:[UIImage imageNamed:@"icon_female"] forState:UIControlStateNormal];
+    }
+    
+    [self setupLevels];
 }
 
 - (void)parseAnatomyData:(NSDictionary*)json {
@@ -291,17 +309,17 @@ float kLayerTransitionTolerance = 10.0f;
        (_totalMaleLayers > 0 && _totalFemaleLayers == 0))
     {
         _showOneGender = YES;
-        _genderSegmentedControl.hidden = YES;
+        _genderButton.hidden = YES;
     }
     else{
         _showOneGender = NO;
-        _genderSegmentedControl.hidden = NO;
+        _genderButton.hidden = NO;
     }
     
     
     [[self.containerView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
     
-    if(_genderSegmentedControl.selectedSegmentIndex == (AnatomyGenderMale-1)){
+    if(_selectedGender == AnatomyGenderMale){
         self.currentGender = @"male";
         _totalLayers = _totalMaleLayers;
         _totalAngles = _totalAnglesPerMaleLayer;
@@ -345,7 +363,7 @@ float kLayerTransitionTolerance = 10.0f;
     NSString *filePath = [@[_folderPath, [NSString stringWithFormat:@"L%02d", layerLevel], _currentGender, [NSString stringWithFormat:@"%02d", frameNum], kImageName] componentsJoinedByString:@"/"];
     UIImage *image = [UIImage imageWithContentsOfFile:filePath];
     
-    CGRect frame = CGRectMake(0.0, 0.0, _containerView.frame.size.width, _containerView.frame.size.width);
+    CGRect frame = CGRectMake(10.0, 0.0, _containerView.frame.size.width - 20.0, _containerView.frame.size.width - 20.0);
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:frame];
     [imageView setContentMode:UIViewContentModeScaleAspectFit];
     [imageView setClipsToBounds:YES];
@@ -380,9 +398,9 @@ float kLayerTransitionTolerance = 10.0f;
     }
 }
 
-- (IBAction)selectedGenderChanged:(id)sender {
-    [self setupLevels];
-}
+//- (IBAction)selectedGenderChanged:(id)sender {
+//    [self setupLevels];
+//}
 
 - (UIImageView*)currentAnatomyImageViewWithIndex:(NSInteger)index{
     return (UIImageView*)[self.containerView viewWithTag:(index+1)];
