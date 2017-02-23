@@ -46,17 +46,6 @@
                         <action selector="dismiss:" destination="-1" eventType="touchUpInside" id="dnd-8v-CxB"/>
                     </connections>
                 </button>
-                <segmentedControl hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="IgU-nF-3n8">
-                    <rect key="frame" x="102" y="384" width="117" height="29"/>
-                    <segments>
-                        <segment title="Female"/>
-                        <segment title="Male"/>
-                    </segments>
-                    <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                    <connections>
-                        <action selector="selectedGenderChanged:" destination="-1" eventType="valueChanged" id="Xsd-Si-ZbL"/>
-                    </connections>
-                </segmentedControl>
                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="pan_icon" translatesAutoresizingMaskIntoConstraints="NO" id="5V7-pt-lK6">
                     <rect key="frame" x="10" y="524" width="21" height="34"/>
                     <constraints>
@@ -64,7 +53,7 @@
                         <constraint firstAttribute="width" constant="21" id="cVc-nv-jpH"/>
                     </constraints>
                 </imageView>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b9G-Q8-A6s">
+                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b9G-Q8-A6s">
                     <rect key="frame" x="271" y="15" width="44" height="44"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="44" id="IEX-id-89N"/>
@@ -88,7 +77,6 @@
                 <constraint firstAttribute="trailing" secondItem="7k7-7v-KFN" secondAttribute="trailing" constant="10" id="GB0-7a-vmj"/>
                 <constraint firstItem="7k7-7v-KFN" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="54" id="HNT-BR-eKI"/>
                 <constraint firstItem="b9G-Q8-A6s" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="15" id="Obu-oS-rE4"/>
-                <constraint firstItem="IgU-nF-3n8" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="TDf-zG-rEQ"/>
                 <constraint firstItem="5V7-pt-lK6" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="10" id="YG7-90-Myg"/>
                 <constraint firstItem="7k7-7v-KFN" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="10" id="YfR-XZ-Vk9"/>
                 <constraint firstItem="87l-W7-cUr" firstAttribute="top" secondItem="7k7-7v-KFN" secondAttribute="bottom" constant="10" id="cvf-tw-SFy"/>
@@ -96,11 +84,6 @@
                 <constraint firstAttribute="bottom" secondItem="87l-W7-cUr" secondAttribute="bottom" id="q8O-wZ-Ty4"/>
             </constraints>
             <nil key="simulatedTopBarMetrics"/>
-            <variation key="default">
-                <mask key="subviews">
-                    <exclude reference="IgU-nF-3n8"/>
-                </mask>
-            </variation>
             <point key="canvasLocation" x="25" y="51"/>
         </view>
     </objects>
