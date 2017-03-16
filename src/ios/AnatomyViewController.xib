@@ -54,7 +54,7 @@
                     </constraints>
                 </imageView>
                 <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b9G-Q8-A6s">
-                    <rect key="frame" x="271" y="15" width="44" height="44"/>
+                    <rect key="frame" x="271" y="519" width="44" height="44"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="44" id="IEX-id-89N"/>
                         <constraint firstAttribute="width" constant="44" id="gaX-0k-NJn"/>
@@ -76,7 +76,7 @@
                 <constraint firstItem="87l-W7-cUr" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="FZ1-J2-qtX"/>
                 <constraint firstAttribute="trailing" secondItem="7k7-7v-KFN" secondAttribute="trailing" constant="10" id="GB0-7a-vmj"/>
                 <constraint firstItem="7k7-7v-KFN" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="54" id="HNT-BR-eKI"/>
-                <constraint firstItem="b9G-Q8-A6s" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="15" id="Obu-oS-rE4"/>
+                <constraint firstAttribute="bottom" secondItem="b9G-Q8-A6s" secondAttribute="bottom" constant="5" id="W8q-n0-6oY"/>
                 <constraint firstItem="5V7-pt-lK6" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="10" id="YG7-90-Myg"/>
                 <constraint firstItem="7k7-7v-KFN" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="10" id="YfR-XZ-Vk9"/>
                 <constraint firstItem="87l-W7-cUr" firstAttribute="top" secondItem="7k7-7v-KFN" secondAttribute="bottom" constant="10" id="cvf-tw-SFy"/>
