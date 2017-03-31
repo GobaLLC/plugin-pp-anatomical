@@ -52,4 +52,50 @@
 
   </platform>
 
+  <platform name="android">
+
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="AnatomyPlugin">
+        <param name="android-package" value="plugin.anatomical.AnatomyPlugin" />
+        <param name="onload" value="true" />
+      </feature>
+    </config-file>
+
+    <source-file src="src/android/AnatomyPlugin.java" target-dir="src/plugin/anatomical"/>
+    <source-file src="src/android/AnatomyActivity.java" target-dir="src/plugin/anatomical"/>
+    <source-file src="src/android/AnatomyImage.java" target-dir="src/plugin/anatomical"/>
+    <source-file src="src/android/AnatomyImageDownloader.java" target-dir="src/plugin/anatomical"/>
+    <source-file src="src/android/OnImageDownloadListener.java" target-dir="src/plugin/anatomical"/>
+    <source-file src="src/android/res/layout/layout_anatomy_activity.xml" target-dir="res/layout" />
+
+    <resource-file src="src/android/res/drawable-mdpi/icon_female.png" target="res/drawable-mdpi/icon_female.png" />
+    <resource-file src="src/android/res/drawable-hdpi/icon_female.png" target="res/drawable-hdpi/icon_female.png" />
+    <resource-file src="src/android/res/drawable-xhdpi/icon_female.png" target="res/drawable-xhdpi/icon_female.png" />
+    <resource-file src="src/android/res/drawable-xxhdpi/icon_female.png" target="res/drawable-xxhdpi/icon_female.png" />
+
+    <resource-file src="src/android/res/drawable-mdpi/icon_male.png" target="res/drawable-mdpi/icon_male.png" />
+    <resource-file src="src/android/res/drawable-hdpi/icon_male.png" target="res/drawable-hdpi/icon_male.png" />
+    <resource-file src="src/android/res/drawable-xhdpi/icon_male.png" target="res/drawable-xhdpi/icon_male.png" />
+    <resource-file src="src/android/res/drawable-xxhdpi/icon_male.png" target="res/drawable-xxhdpi/icon_male.png" />
+
+    <resource-file src="src/android/res/drawable-mdpi/pan_icon.png" target="res/drawable-mdpi/pan_icon.png" />
+    <resource-file src="src/android/res/drawable-hdpi/pan_icon.png" target="res/drawable-hdpi/pan_icon.png" />
+    <resource-file src="src/android/res/drawable-xhdpi/pan_icon.png" target="res/drawable-xhdpi/pan_icon.png" />
+    <resource-file src="src/android/res/drawable-xxhdpi/pan_icon.png" target="res/drawable-xxhdpi/pan_icon.png" />
+
+
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+      <uses-permission android:name="android.permission.INTERNET" />
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+      <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    </config-file>
+
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+      <activity android:name="plugin.anatomical.AnatomyActivity" android:screenOrientation="portrait">
+      </activity>
+    </config-file>
+
+    <framework src="src/android/anatomyplugin.gradle" custom="true" type="gradleReference" />
+  </platform>
+
 </plugin>
