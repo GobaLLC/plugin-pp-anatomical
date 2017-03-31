@@ -3,12 +3,12 @@ package plugin.anatomical;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -17,13 +17,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.example.anatomicalplugin.R;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -109,15 +107,19 @@ public class AnatomyActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.layout_anatomy_activity);
+        String package_name = getApplication().getPackageName();
+        Resources resources = getApplication().getResources();
+        setContentView(resources.getIdentifier("layout_anatomy_activity", "layout", package_name));
+
+//        setContentView(R.layout.layout_anatomy_activity);
 
         mContext = this;
 
         translate = new Matrix();
 
-        mActivityLayout = (RelativeLayout) findViewById(R.id.layout_activity);
-        mContainer = (FrameLayout) findViewById(R.id.container);
-        mGenderButton = (ImageView) findViewById(R.id.button_gender);
+        mActivityLayout = (RelativeLayout) findViewById(resources.getIdentifier("layout_activity", "id", package_name));
+        mContainer = (FrameLayout) findViewById(resources.getIdentifier("container", "id", package_name));
+        mGenderButton = (ImageView) findViewById(resources.getIdentifier("button_gender", "id", package_name));
 //        imageView = (ImageView) findViewById(R.id.imageview);
 
         mDetector = new GestureDetector(mContext, new GestureListener());
@@ -335,13 +337,16 @@ public class AnatomyActivity extends Activity {
     }
 
     public void genderButtonPressed(View v) {
+        String package_name = getApplication().getPackageName();
+        Resources resources = getApplication().getResources();
+
         if(_selectedGender == AnatomyActivity.GENDER_MALE) {
             _selectedGender = AnatomyActivity.GENDER_FEMALE;
-            mGenderButton.setImageResource(R.drawable.icon_female);
+            mGenderButton.setImageResource(resources.getIdentifier("icon_female", "drawable", package_name));
         }
         else{
             _selectedGender = AnatomyActivity.GENDER_MALE;
-            mGenderButton.setImageResource(R.drawable.icon_male);
+            mGenderButton.setImageResource(resources.getIdentifier("icon_male", "drawable", package_name));
         }
         setupLevels();
     }
