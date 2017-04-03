@@ -17,6 +17,8 @@
             android:background="@android:drawable/list_selector_background"
             android:textStyle="bold"
             android:textColor="@android:color/black"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
             android:onClick="backButtonPressed"/>
     </RelativeLayout>
 
