@@ -148,7 +148,8 @@ public class AnatomyActivity extends Activity {
         _anatomyIdentifier = _jsonData.optString("nID");
 
         setTitle(_anatomyName);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        if(getActionBar() != null)
+            getActionBar().setDisplayHomeAsUpEnabled(true);
 
 //        _prevPoint = mContainer.get
 
