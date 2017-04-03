@@ -4,17 +4,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white">
+
+    <RelativeLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp">
+
+        <Button
+            android:id="@+id/button_back"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@android:drawable/list_selector_background"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:onClick="backButtonPressed"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
     <FrameLayout
         android:id="@+id/container"
-        android:background="@android:color/white"
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="200dp"
+        android:layout_below="@+id/title"
+        android:background="@android:color/white">
 
-        <!--<ImageView-->
-            <!--android:id="@+id/imageview"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:src="@drawable/screen"/>-->
     </FrameLayout>
 
     <ImageView
@@ -23,10 +47,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:text="pan"
-        android:layout_marginLeft="5dp"
         android:layout_marginBottom="5dp"
-        android:src="@drawable/pan_icon"/>
+        android:layout_marginLeft="5dp"
+        android:src="@drawable/pan_icon"
+        android:text="pan" />
 
     <ImageView
         android:id="@+id/button_gender"
@@ -34,11 +58,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="5dp"
         android:layout_marginBottom="5dp"
-        android:paddingTop="20dp"
-        android:paddingLeft="20dp"
+        android:layout_marginRight="5dp"
         android:clickable="true"
         android:onClick="genderButtonPressed"
-        android:src="@drawable/icon_female"/>
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp"
+        android:src="@drawable/icon_female" />
 </RelativeLayout>

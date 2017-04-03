@@ -17,9 +17,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
@@ -47,6 +49,8 @@ public class AnatomyActivity extends Activity {
     private RelativeLayout mActivityLayout;
     private FrameLayout mContainer;
     private ImageView mGenderButton;
+    private Button mBackButton;
+    private TextView mTitle;
 //    private ImageView imageView;
 
     private JSONObject _jsonData;
@@ -107,8 +111,8 @@ public class AnatomyActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String package_name = getApplication().getPackageName();
-        Resources resources = getApplication().getResources();
+        final String package_name = getApplication().getPackageName();
+        final Resources resources = getApplication().getResources();
         setContentView(resources.getIdentifier("layout_anatomy_activity", "layout", package_name));
 
 //        setContentView(R.layout.layout_anatomy_activity);
@@ -120,6 +124,8 @@ public class AnatomyActivity extends Activity {
         mActivityLayout = (RelativeLayout) findViewById(resources.getIdentifier("layout_activity", "id", package_name));
         mContainer = (FrameLayout) findViewById(resources.getIdentifier("container", "id", package_name));
         mGenderButton = (ImageView) findViewById(resources.getIdentifier("button_gender", "id", package_name));
+        mTitle = (TextView) findViewById(resources.getIdentifier("title", "id", package_name));
+        mBackButton = (Button) findViewById(resources.getIdentifier("button_back", "id", package_name));
 //        imageView = (ImageView) findViewById(R.id.imageview);
 
         mDetector = new GestureDetector(mContext, new GestureListener());
@@ -147,9 +153,8 @@ public class AnatomyActivity extends Activity {
         _anatomyName = _jsonData.optString("sTitle");
         _anatomyIdentifier = _jsonData.optString("nID");
 
-        setTitle(_anatomyName);
-        if(getActionBar() != null)
-            getActionBar().setDisplayHomeAsUpEnabled(true);
+        mTitle.setText(_anatomyName);
+        mBackButton.setText("< Back");
 
 //        _prevPoint = mContainer.get
 
@@ -180,6 +185,7 @@ public class AnatomyActivity extends Activity {
             @Override
             public void onGlobalLayout() {
                 RelativeLayout.LayoutParams _rootLayoutParams = new RelativeLayout.LayoutParams(mContainer.getWidth(), mContainer.getWidth());
+                _rootLayoutParams.addRule(RelativeLayout.BELOW, resources.getIdentifier("title", "id", package_name));
                 mContainer.setLayoutParams(_rootLayoutParams);
                 mContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
@@ -334,6 +340,10 @@ public class AnatomyActivity extends Activity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        finish();
+    }
+
+    public void backButtonPressed(View v) {
         finish();
     }
 
