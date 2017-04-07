@@ -1,6 +1,7 @@
 package plugin.anatomical;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.Resources;
@@ -9,6 +10,8 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -51,7 +54,7 @@ public class AnatomyActivity extends Activity {
     private ImageView mGenderButton;
     private Button mBackButton;
     private TextView mTitle;
-//    private ImageView imageView;
+    private ProgressDialog mProgressDialog;
 
     private JSONObject _jsonData;
     private String _anatomyName;
@@ -115,8 +118,6 @@ public class AnatomyActivity extends Activity {
         final Resources resources = getApplication().getResources();
         setContentView(resources.getIdentifier("layout_anatomy_activity", "layout", package_name));
 
-//        setContentView(R.layout.layout_anatomy_activity);
-
         mContext = this;
 
         translate = new Matrix();
@@ -126,7 +127,6 @@ public class AnatomyActivity extends Activity {
         mGenderButton = (ImageView) findViewById(resources.getIdentifier("button_gender", "id", package_name));
         mTitle = (TextView) findViewById(resources.getIdentifier("title", "id", package_name));
         mBackButton = (Button) findViewById(resources.getIdentifier("button_back", "id", package_name));
-//        imageView = (ImageView) findViewById(R.id.imageview);
 
         mDetector = new GestureDetector(mContext, new GestureListener());
         mActivityLayout.setOnTouchListener(new View.OnTouchListener() {
@@ -156,8 +156,6 @@ public class AnatomyActivity extends Activity {
         mTitle.setText(_anatomyName);
         mBackButton.setText("< Back");
 
-//        _prevPoint = mContainer.get
-
         _currentLayerValue = 0.0f;
         _currentLayer = 0;
         _currentFrame = 0;
@@ -171,11 +169,9 @@ public class AnatomyActivity extends Activity {
 
         _folderName = _anatomyIdentifier;
 
-//        File sd = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-//        File sd =  Environment.getExternalStorageDirectory();
 
         ContextWrapper cw = new ContextWrapper(mContext);
-        String name_="foldername"; //Folder name in device android/data/
+        String name_ = "foldername"; //Folder name in device android/data/
         File sd = cw.getDir(name_, Context.MODE_PRIVATE);
 
         _storageFolder = new File(sd, _folderName);
@@ -198,17 +194,17 @@ public class AnatomyActivity extends Activity {
 
         parseAnatomyData(_jsonData);
 
-        ArrayList<AnatomyImage>  anatomyImagesToDownload = new ArrayList<AnatomyImage>();
+        ArrayList<AnatomyImage> anatomyImagesToDownload = new ArrayList<AnatomyImage>();
         anatomyImagesToDownload.addAll(_maleAnatomyImages);
         anatomyImagesToDownload.addAll(_femaleAnatomyImages);
         downloadImagesToDisk(anatomyImagesToDownload);
     }
 
-    private void onResetLocation(){
+    private void onResetLocation() {
         translate.reset();
     }
 
-    private void onMove(float dx, float dy){
+    private void onMove(float dx, float dy) {
         translate.postTranslate(dx, dy);
     }
 
@@ -247,8 +243,8 @@ public class AnatomyActivity extends Activity {
                 angleIndex++;
             }
 
-            if(angleIndex > 0){
-                if(_totalAnglesPerMaleLayer > 0)
+            if (angleIndex > 0) {
+                if (_totalAnglesPerMaleLayer > 0)
                     _totalAnglesPerMaleLayer = Math.min(_totalAnglesPerMaleLayer, angleIndex);
                 else
                     _totalAnglesPerMaleLayer = angleIndex;
@@ -273,8 +269,8 @@ public class AnatomyActivity extends Activity {
                 angleIndex++;
             }
 
-            if(angleIndex > 0){
-                if(_totalAnglesPerFemaleLayer > 0)
+            if (angleIndex > 0) {
+                if (_totalAnglesPerFemaleLayer > 0)
                     _totalAnglesPerFemaleLayer = Math.min(_totalAnglesPerFemaleLayer, angleIndex);
                 else
                     _totalAnglesPerFemaleLayer = angleIndex;
@@ -288,8 +284,14 @@ public class AnatomyActivity extends Activity {
         _totalImagesToDownload = _maleAnatomyImages.size() + _femaleAnatomyImages.size();
     }
 
-    private void downloadImagesToDisk(ArrayList<AnatomyImage> anatomyImagesToDownload){
-        for(AnatomyImage anatomyImage : anatomyImagesToDownload){
+    private void downloadImagesToDisk(ArrayList<AnatomyImage> anatomyImagesToDownload) {
+        mProgressDialog = new ProgressDialog(AnatomyActivity.this);
+        mProgressDialog.setMax((int) _totalImagesToDownload);
+        mProgressDialog.setMessage("Loading images....");
+        mProgressDialog.setTitle(_anatomyName);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.show();
+        for (AnatomyImage anatomyImage : anatomyImagesToDownload) {
 
             final AnatomyImageDownloader downloader = new AnatomyImageDownloader(mContext, anatomyImage);
             protectedFromGarbageCollectorTargets.add(downloader);
@@ -297,35 +299,39 @@ public class AnatomyActivity extends Activity {
             downloader.setOnImageDownloadListener(new OnImageDownloadListener() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    protectedFromGarbageCollectorTargets.remove(downloader);
-                    Log.d("IMAGES LEFT", "IMAGES LEFT " + protectedFromGarbageCollectorTargets.size());
-                    if(protectedFromGarbageCollectorTargets.size() == 0){
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                setupLevels();
-                            }
-                        });
-                    }
+                    handleImageDownloadCompletion(downloader);
                 }
 
                 @Override
                 public void onBitmapFailed(Drawable errorDrawable) {
-                    protectedFromGarbageCollectorTargets.remove(downloader);
-                    Log.d("IMAGES LEFT", "IMAGES LEFT " + protectedFromGarbageCollectorTargets.size());
-                    if(protectedFromGarbageCollectorTargets.size() == 0){
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                setupLevels();
-                            }
-                        });
-                    }
+                    handleImageDownloadCompletion(downloader);
                 }
             });
         }
     }
 
+    Handler handle = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            mProgressDialog.incrementProgressBy(1);
+        }
+    };
+
+    private void handleImageDownloadCompletion(AnatomyImageDownloader downloader) {
+        handle.sendMessage(handle.obtainMessage());
+        protectedFromGarbageCollectorTargets.remove(downloader);
+        Log.d("IMAGES LEFT", "IMAGES LEFT " + protectedFromGarbageCollectorTargets.size());
+        if (protectedFromGarbageCollectorTargets.size() == 0) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setupLevels();
+                    mProgressDialog.dismiss();
+                }
+            });
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -351,11 +357,10 @@ public class AnatomyActivity extends Activity {
         String package_name = getApplication().getPackageName();
         Resources resources = getApplication().getResources();
 
-        if(_selectedGender == AnatomyActivity.GENDER_MALE) {
+        if (_selectedGender == AnatomyActivity.GENDER_MALE) {
             _selectedGender = AnatomyActivity.GENDER_FEMALE;
             mGenderButton.setImageResource(resources.getIdentifier("icon_female", "drawable", package_name));
-        }
-        else{
+        } else {
             _selectedGender = AnatomyActivity.GENDER_MALE;
             mGenderButton.setImageResource(resources.getIdentifier("icon_male", "drawable", package_name));
         }
@@ -363,20 +368,18 @@ public class AnatomyActivity extends Activity {
     }
 
     private void setupLevels() {
-        if((_totalMaleLayers == 0 && _totalFemaleLayers > 0) ||
-                (_totalMaleLayers > 0 && _totalFemaleLayers == 0))
-        {
+        if ((_totalMaleLayers == 0 && _totalFemaleLayers > 0) ||
+                (_totalMaleLayers > 0 && _totalFemaleLayers == 0)) {
             _showOneGender = true;
             mGenderButton.setVisibility(View.INVISIBLE);
-        }
-        else{
+        } else {
             _showOneGender = false;
             mGenderButton.setVisibility(View.VISIBLE);
         }
 
         mContainer.removeAllViews();
 
-        if(_selectedGender == AnatomyActivity.GENDER_MALE){
+        if (_selectedGender == AnatomyActivity.GENDER_MALE) {
             _currentGender = "male";
             _totalLayers = _totalMaleLayers;
             _totalAngles = _totalAnglesPerMaleLayer;
@@ -388,8 +391,7 @@ public class AnatomyActivity extends Activity {
             _currentLayer = _currentMaleLayer;
             _currentFrame = _currentMaleFrame;
             _currentLayerValue = _currentMaleLayerValue;
-        }
-        else{
+        } else {
             _currentGender = "female";
             _totalLayers = _totalFemaleLayers;
             _totalAngles = _totalAnglesPerFemaleLayer;
@@ -407,13 +409,13 @@ public class AnatomyActivity extends Activity {
         _currentLayer = 0;
         _currentFrame = 0;
 
-        for (int i=(_totalLayers-1); i>=0; i--){
+        for (int i = (_totalLayers - 1); i >= 0; i--) {
             addImageViewToLayer(i, _currentFrame);
         }
     }
 
     private void addImageViewToLayer(int layerLevel, int frameNum) {
-        int nextLayer = Math.min(_currentLayer+1, _totalAngles);
+        int nextLayer = Math.min(_currentLayer + 1, _totalAngles);
 
         List<String> paths = new ArrayList<String>();
         paths.add(_folderPath);
@@ -425,15 +427,14 @@ public class AnatomyActivity extends Activity {
         String filePath = TextUtils.join("/", paths);
 
         ImageView imageView = new ImageView(mContext);
-        imageView.setTag("imageview" + (layerLevel+1));
+        imageView.setTag("imageview" + (layerLevel + 1));
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(mContainer.getWidth(), mContainer.getWidth());
         imageView.setLayoutParams(layoutParams);
 
-        if(_currentLayer == layerLevel){
+        if (_currentLayer == layerLevel) {
             float alpha = nextLayer - _currentLayerValue;
             imageView.setAlpha(alpha);
-        }
-        else{
+        } else {
             imageView.setAlpha(1.0f);
         }
         mContainer.addView(imageView);
@@ -445,16 +446,31 @@ public class AnatomyActivity extends Activity {
 
     private void updateAnatomyImageFrame(int nextFrame, int frameAfterNext) {
 
-        for (int i=(_totalLayers-1); i>=0; i--){
-            if(nextFrame >= _totalAngles) {
+        String picassoTag = "picassoTag";
+//        Picasso.with(mContext).cancelTag(picassoTag);
+//        ArrayList<Integer> layersToProcess = new ArrayList<Integer>();
+//        for(int j = _currentLayer; j <= _totalLayers - 1; j++){
+////            if(layersToProcess.size() < 2)
+//                layersToProcess.add(j);
+//        }
+//
+//        if(_currentLayer != 0) {
+//            for (int k = 0; k < _currentLayer; k++) {
+////                if(layersToProcess.size() < 2)
+//                    layersToProcess.add(k);
+//            }
+//        }
+
+//        int i=0;
+        for (int i = (_totalLayers - 1); i >= 0; i--) {
+//        for (Integer layer : layersToProcess) {
+            if (nextFrame >= _totalAngles) {
                 _currentFrame = 0;
                 frameAfterNext = _currentFrame + 1;
-            }
-            else if(nextFrame < 0) {
+            } else if (nextFrame < 0) {
                 _currentFrame = _totalAngles - 1;
                 frameAfterNext = _currentFrame - 1;
-            }
-            else {
+            } else {
                 _currentFrame = nextFrame;
             }
 
@@ -470,25 +486,40 @@ public class AnatomyActivity extends Activity {
             File myImageFile = new File(filePath);
 
 
-            List<String> nextPaths = new ArrayList<String>();
-            nextPaths.add(_folderPath);
-            nextPaths.add(String.format("L%02d", i));
-            nextPaths.add(_currentGender);
-            nextPaths.add(String.format("%02d", frameAfterNext));
-            nextPaths.add(IMAGE_NAME);
-            String nextFilePath = TextUtils.join("/", nextPaths);
-            File myNextImageFile = new File(nextFilePath);
+//            List<String> nextPaths = new ArrayList<String>();
+//            nextPaths.add(_folderPath);
+//            nextPaths.add(String.format("L%02d", i));
+//            nextPaths.add(_currentGender);
+//            nextPaths.add(String.format("%02d", frameAfterNext));
+//            nextPaths.add(IMAGE_NAME);
+//            String nextFilePath = TextUtils.join("/", nextPaths);
+//            File myNextImageFile = new File(nextFilePath);
 
-            Picasso.with(mContext).load(myNextImageFile).fetch();
+//            Picasso.Priority nextFramePriority = Picasso.Priority.NORMAL;
+//            if(i==0)
+//                nextFramePriority = Picasso.Priority.HIGH;
+//            else
+//                nextFramePriority = Picasso.Priority.LOW;
+
+//            Picasso.with(mContext).load(myNextImageFile).priority(nextFramePriority).tag(picassoTag).fetch();
 
 
-            ImageView imageView =  getCurrentAnatomyImageView(i);
-            Picasso.with(mContext.getApplicationContext()).load(myImageFile).into(imageView);
+            ImageView imageView = getCurrentAnatomyImageView(i);
+
+            Picasso.Priority priority = Picasso.Priority.NORMAL;
+//            if(i==0)
+//                priority = Picasso.Priority.HIGH;
+//            else
+//                priority = Picasso.Priority.NORMAL;
+
+            Picasso.with(mContext.getApplicationContext()).load(myImageFile).noFade().noPlaceholder().priority(priority).tag(picassoTag).into(imageView);
+
+//            i++;
         }
     }
 
-    private ImageView getCurrentAnatomyImageView(int index){
-        return (ImageView) mContainer.findViewWithTag("imageview" + (index+1));
+    private ImageView getCurrentAnatomyImageView(int index) {
+        return (ImageView) mContainer.findViewWithTag("imageview" + (index + 1));
     }
 
 
@@ -514,37 +545,37 @@ public class AnatomyActivity extends Activity {
             translate.getValues(values);
             float globalX = values[Matrix.MTRANS_X];
             float globalY = values[Matrix.MTRANS_Y];
-            Log.d("TRANSLATION", "distanceX: " + globalX  + " distanceY: " + globalY);
+            Log.d("TRANSLATION", "distanceX: " + globalX + " distanceY: " + globalY);
 
 
 //            Log.d("TRANSLATION", "distanceX: " + xTranslation + " distanceY: " + yTranslation);
 
-            if(Math.abs(globalX) >= FRAME_ROTATION_TOLERANCE){
+            if (Math.abs(globalX) >= FRAME_ROTATION_TOLERANCE) {
                 Log.d("THRESHOLD FRAME", "distanceX: " + globalX + " distanceY: " + globalY);
-                float nextFrame = _currentFrame - (globalX/FRAME_ROTATION_TOLERANCE);
+                float nextFrame = _currentFrame - (globalX / FRAME_ROTATION_TOLERANCE);
 
                 float frameAfterNext;
-                if(_currentFrame > nextFrame)
+                if (_currentFrame > nextFrame)
                     frameAfterNext = nextFrame - 1;
                 else
                     frameAfterNext = nextFrame + 1;
-                updateAnatomyImageFrame((int)nextFrame, (int)frameAfterNext);
+                updateAnatomyImageFrame((int) nextFrame, (int) frameAfterNext);
                 onResetLocation();
                 return true;
             }
 
-            if(Math.abs(globalY) >= LAYER_TRANSITION_TOLERANCE){
+            if (Math.abs(globalY) >= LAYER_TRANSITION_TOLERANCE) {
                 Log.d("THRESHOLD LAYER", "distanceX: " + globalX + " distanceY: " + globalY);
                 _currentLayerValue = _currentLayerValue + ((globalY / LAYER_TRANSITION_TOLERANCE) * 0.1f);
                 _currentLayerValue = Math.max(_currentLayerValue, 0.0f);
                 _currentLayerValue = Math.min(_currentLayerValue, _totalLayers);
-                _currentLayer = (int)Math.floor((double)_currentLayerValue);
+                _currentLayer = (int) Math.floor((double) _currentLayerValue);
 
-                if(_currentLayer != (_totalLayers - 1)){
-                    int nextLayer = Math.min(_currentLayer+1, _totalAngles);
+                if (_currentLayer != (_totalLayers - 1)) {
+                    int nextLayer = Math.min(_currentLayer + 1, _totalAngles);
                     ImageView currentImageView = getCurrentAnatomyImageView(_currentLayer);
                     float alpha = nextLayer - _currentLayerValue;
-                    if(currentImageView != null)
+                    if (currentImageView != null)
                         currentImageView.setAlpha(alpha);
                 }
 
