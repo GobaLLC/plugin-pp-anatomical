@@ -107,7 +107,16 @@ public class AnatomyActivity extends Activity {
     private String urls = "http://api.androidhive.info/images/sample.jpg";
     private String[] urlArray = {mURL, urls};
 
+
+    private static final float FRAME_ROTATION_TOLERANCE = 15.0f;
+    private static final float LAYER_TRANSITION_TOLERANCE = 10.0f;
+
     final Set<AnatomyImageDownloader> protectedFromGarbageCollectorTargets = new HashSet<AnatomyImageDownloader>();
+
+    private static final int FRAME_BUFFER = 3;
+    private static final int LAYER_BUFFER = 3;
+    private int rotationBuffer = FRAME_BUFFER;
+    private int layerBuffer = LAYER_BUFFER;
 
 
     @Override
@@ -191,6 +200,10 @@ public class AnatomyActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        if(mContainer.getChildCount() > 0){
+            return;
+        }
 
         parseAnatomyData(_jsonData);
 
@@ -443,27 +456,59 @@ public class AnatomyActivity extends Activity {
         Picasso.with(this).load(myImageFile).into(imageView);
     }
 
+    private void updateAnatomyImageLayer(int nextLayer, int layerAfterNext){
+        String picassoTag = "picassoTag";
+
+        ArrayList<Integer> layersToProcess = new ArrayList<Integer>();
+        layersToProcess.add(nextLayer);
+        layersToProcess.add(layerAfterNext);
+
+        for (Integer layer : layersToProcess) {
+            List<String> paths = new ArrayList<String>();
+            paths.add(_folderPath);
+            paths.add(String.format("L%02d", layer));
+            paths.add(_currentGender);
+            paths.add(String.format("%02d", _currentFrame));
+            paths.add(IMAGE_NAME);
+            String filePath = TextUtils.join("/", paths);
+            File myImageFile = new File(filePath);
+
+            ImageView imageView = getCurrentAnatomyImageView(layer);
+            if(imageView == null){
+                continue;
+            }
+
+            Picasso.Priority priority;
+            if(layer==nextLayer)
+                priority = Picasso.Priority.HIGH;
+            else
+                priority = Picasso.Priority.LOW;
+
+            Picasso.with(mContext.getApplicationContext()).load(myImageFile).noFade().noPlaceholder().priority(priority).tag(picassoTag).into(imageView);
+        }
+    }
+
 
     private void updateAnatomyImageFrame(int nextFrame, int frameAfterNext) {
 
         String picassoTag = "picassoTag";
 //        Picasso.with(mContext).cancelTag(picassoTag);
-//        ArrayList<Integer> layersToProcess = new ArrayList<Integer>();
-//        for(int j = _currentLayer; j <= _totalLayers - 1; j++){
-////            if(layersToProcess.size() < 2)
-//                layersToProcess.add(j);
-//        }
+        ArrayList<Integer> layersToProcess = new ArrayList<Integer>();
+        for(int j = _currentLayer; j <= _totalLayers - 1; j++){
+            if(layersToProcess.size() < 2)
+                layersToProcess.add(j);
+        }
 //
-//        if(_currentLayer != 0) {
-//            for (int k = 0; k < _currentLayer; k++) {
-////                if(layersToProcess.size() < 2)
-//                    layersToProcess.add(k);
-//            }
-//        }
+        if(_currentLayer != 0) {
+            for (int k = 0; k < _currentLayer; k++) {
+                if(layersToProcess.size() < 2)
+                    layersToProcess.add(k);
+            }
+        }
 
-//        int i=0;
-        for (int i = (_totalLayers - 1); i >= 0; i--) {
-//        for (Integer layer : layersToProcess) {
+        int i=0;
+//        for (int i = (_totalLayers - 1); i >= 0; i--) {
+        for (Integer layer : layersToProcess) {
             if (nextFrame >= _totalAngles) {
                 _currentFrame = 0;
                 frameAfterNext = _currentFrame + 1;
@@ -478,7 +523,7 @@ public class AnatomyActivity extends Activity {
 
             List<String> paths = new ArrayList<String>();
             paths.add(_folderPath);
-            paths.add(String.format("L%02d", i));
+            paths.add(String.format("L%02d", layer));
             paths.add(_currentGender);
             paths.add(String.format("%02d", _currentFrame));
             paths.add(IMAGE_NAME);
@@ -504,27 +549,23 @@ public class AnatomyActivity extends Activity {
 //            Picasso.with(mContext).load(myNextImageFile).priority(nextFramePriority).tag(picassoTag).fetch();
 
 
-            ImageView imageView = getCurrentAnatomyImageView(i);
+            ImageView imageView = getCurrentAnatomyImageView(layer);
 
-            Picasso.Priority priority = Picasso.Priority.NORMAL;
-//            if(i==0)
-//                priority = Picasso.Priority.HIGH;
-//            else
-//                priority = Picasso.Priority.NORMAL;
+            Picasso.Priority priority;
+            if(layer==_currentLayer)
+                priority = Picasso.Priority.HIGH;
+            else
+                priority = Picasso.Priority.LOW;
 
             Picasso.with(mContext.getApplicationContext()).load(myImageFile).noFade().noPlaceholder().priority(priority).tag(picassoTag).into(imageView);
 
-//            i++;
+            i++;
         }
     }
 
     private ImageView getCurrentAnatomyImageView(int index) {
         return (ImageView) mContainer.findViewWithTag("imageview" + (index + 1));
     }
-
-
-    private static final float FRAME_ROTATION_TOLERANCE = 20.0f;
-    private static final float LAYER_TRANSITION_TOLERANCE = 10.0f;
 
 
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -545,13 +586,20 @@ public class AnatomyActivity extends Activity {
             translate.getValues(values);
             float globalX = values[Matrix.MTRANS_X];
             float globalY = values[Matrix.MTRANS_Y];
-            Log.d("TRANSLATION", "distanceX: " + globalX + " distanceY: " + globalY);
+//            Log.d("TRANSLATION", "distanceX: " + globalX + " distanceY: " + globalY);
 
 
 //            Log.d("TRANSLATION", "distanceX: " + xTranslation + " distanceY: " + yTranslation);
 
             if (Math.abs(globalX) >= FRAME_ROTATION_TOLERANCE) {
-                Log.d("THRESHOLD FRAME", "distanceX: " + globalX + " distanceY: " + globalY);
+//                if(rotationBuffer != 0){
+//                    rotationBuffer--;
+//                    return false;
+//                }
+//                else{
+//                    rotationBuffer = FRAME_BUFFER;
+//                }
+//                Log.d("THRESHOLD FRAME", "distanceX: " + globalX + " distanceY: " + globalY);
                 float nextFrame = _currentFrame - (globalX / FRAME_ROTATION_TOLERANCE);
 
                 float frameAfterNext;
@@ -565,23 +613,44 @@ public class AnatomyActivity extends Activity {
             }
 
             if (Math.abs(globalY) >= LAYER_TRANSITION_TOLERANCE) {
-                Log.d("THRESHOLD LAYER", "distanceX: " + globalX + " distanceY: " + globalY);
+
+//                if(layerBuffer != 0){
+//                    layerBuffer--;
+//                    return false;
+//                }
+//                else{
+//                    layerBuffer = LAYER_BUFFER;
+//                }
+
+//                Log.d("THRESHOLD LAYER", "distanceX: " + globalX + " distanceY: " + globalY);
                 _currentLayerValue = _currentLayerValue + ((globalY / LAYER_TRANSITION_TOLERANCE) * 0.1f);
                 _currentLayerValue = Math.max(_currentLayerValue, 0.0f);
                 _currentLayerValue = Math.min(_currentLayerValue, _totalLayers);
                 _currentLayer = (int) Math.floor((double) _currentLayerValue);
 
+
                 if (_currentLayer != (_totalLayers - 1)) {
                     int nextLayer = Math.min(_currentLayer + 1, _totalAngles);
                     ImageView currentImageView = getCurrentAnatomyImageView(_currentLayer);
                     float alpha = nextLayer - _currentLayerValue;
-                    if (currentImageView != null)
+                    if (currentImageView != null) {
+                        if(alpha < 0.25){
+                            int layerAfterNext  = nextLayer - 1;
+                            updateAnatomyImageLayer(nextLayer, layerAfterNext);
+                        }
+                        else if(alpha >= 0.75){
+                            int layerAfterNext = nextLayer + 1;
+                            updateAnatomyImageLayer(nextLayer, layerAfterNext);
+                        }
+                        Log.d("THRESHOLD LAYER", "currentLayerValue: " + _currentLayerValue + " currentLayer: " + _currentLayer + " nextLayer: " + nextLayer + " alpha: " + alpha);
                         currentImageView.setAlpha(alpha);
+                        onResetLocation();
+
+                        return true;
+                    }
                 }
 
-                onResetLocation();
-
-                return true;
+                return false;
             }
 
             return false;
