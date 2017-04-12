@@ -90,6 +90,7 @@ public class AnatomyActivity extends Activity {
     private int _totalAngles;
     private int _currentFrame;
     private int _currentLayer;
+    private String _prevTag;
     private float _currentLayerValue;
 
     private float _numberOfImagesLoaded;
@@ -608,6 +609,8 @@ public class AnatomyActivity extends Activity {
                 else
                     frameAfterNext = nextFrame + 1;
                 updateAnatomyImageFrame((int) nextFrame, (int) frameAfterNext);
+
+                Log.d("ROTATING FRAME", "rotating frame currentLayerValue: " + _currentLayerValue + " currentLayer: " + _currentLayer + " currentFrame: " + _currentFrame + " nextFrame: " + nextFrame);
                 onResetLocation();
                 return true;
             }
@@ -623,25 +626,71 @@ public class AnatomyActivity extends Activity {
 //                }
 
 //                Log.d("THRESHOLD LAYER", "distanceX: " + globalX + " distanceY: " + globalY);
+
+                String direction;
+                float prevLayerValue = _currentLayerValue;
                 _currentLayerValue = _currentLayerValue + ((globalY / LAYER_TRANSITION_TOLERANCE) * 0.1f);
                 _currentLayerValue = Math.max(_currentLayerValue, 0.0f);
-                _currentLayerValue = Math.min(_currentLayerValue, _totalLayers);
+                _currentLayerValue = Math.min(_currentLayerValue, _totalLayers - 1);
                 _currentLayer = (int) Math.floor((double) _currentLayerValue);
 
+                if(prevLayerValue > _currentLayerValue)
+                    direction = "up";
+                else
+                    direction = "down";
+
+                Log.d("Direction", "direction " + direction);
 
                 if (_currentLayer != (_totalLayers - 1)) {
-                    int nextLayer = Math.min(_currentLayer + 1, _totalAngles);
+                    int nextLayer = Math.min(_currentLayer + 1, _totalLayers);
                     ImageView currentImageView = getCurrentAnatomyImageView(_currentLayer);
                     float alpha = nextLayer - _currentLayerValue;
                     if (currentImageView != null) {
-                        if(alpha < 0.25){
-                            int layerAfterNext  = nextLayer - 1;
-                            updateAnatomyImageLayer(nextLayer, layerAfterNext);
+
+                        if(direction.equalsIgnoreCase("up")){
+//                            if(alpha >= 0.51) {
+                                ImageView prevImageView = (ImageView) mContainer.findViewWithTag("imageview" + (_currentLayer + 1));
+                                ImageView prevAfterImageView = (ImageView) mContainer.findViewWithTag("imageview" + (_currentLayer + 2));
+                                if (prevImageView != null) {
+                                    Log.d("PrevImageAlpha", "prevImageView alpha " + prevImageView.getAlpha());
+//                                    if (prevImageView.getAlpha() > 0.0) {
+                                        prevImageView.setAlpha(1.0f);
+//                                    prevImageView.setVisibility(View.GONE);
+//                                        prevImageView.setVisibility(View.INVISIBLE);
+//                                    }
+                                }
+                            if (prevAfterImageView != null) {
+                                prevAfterImageView.setAlpha(1.0f);
+                            }
+//                            ImageView nextImageView = (ImageView) mContainer.findViewWithTag("imageview" + (_currentLayer - 1));
+//                            if (nextImageView != null) {
+////                                nextImageView.setVisibility(View.VISIBLE);
+//                            }
+                                updateAnatomyImageLayer(_currentLayer - 1, _currentLayer - 2);
+//                            }
                         }
-                        else if(alpha >= 0.75){
-                            int layerAfterNext = nextLayer + 1;
-                            updateAnatomyImageLayer(nextLayer, layerAfterNext);
+                        else {
+//                            if(alpha < 0.49){
+                                ImageView prevImageView = (ImageView) mContainer.findViewWithTag("imageview" + (_currentLayer - 1));
+                                ImageView prevAfterImageView = (ImageView) mContainer.findViewWithTag("imageview" + (_currentLayer - 2));
+                                if (prevImageView != null) {
+                                    Log.d("PrevImageAlpha", "prevImageView alpha " + prevImageView.getAlpha());
+//                                    if(prevImageView.getAlpha() > 0.0){
+                                        prevImageView.setAlpha(0.0f);
+//                                        prevImageView.setVisibility(View.INVISIBLE);
+//                                    }
+                                }
+                            if (prevAfterImageView != null) {
+                                prevAfterImageView.setAlpha(0.0f);
+                            }
+//                            ImageView nextImageView = (ImageView) mContainer.findViewWithTag("imageview" + (_currentLayer + 1));
+//                            if (nextImageView != null) {
+////                                nextImageView.setVisibility(View.VISIBLE);
+//                            }
+                                updateAnatomyImageLayer(_currentLayer + 1, _currentLayer + 2);
+//                            }
                         }
+
                         Log.d("THRESHOLD LAYER", "currentLayerValue: " + _currentLayerValue + " currentLayer: " + _currentLayer + " nextLayer: " + nextLayer + " alpha: " + alpha);
                         currentImageView.setAlpha(alpha);
                         onResetLocation();
