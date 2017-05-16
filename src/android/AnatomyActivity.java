@@ -147,6 +147,8 @@ public class AnatomyActivity extends Activity {
             }
         });
 
+        mGenderButton.setVisibility(View.INVISIBLE);
+
         String jsonExtra = getIntent().getStringExtra("jsonData");
 
         try {
@@ -241,20 +243,21 @@ public class AnatomyActivity extends Activity {
             JSONObject layerObj = aLayers.optJSONObject(i);
             String layerFolderName = _folderName + "/L" + String.format("%02d", layerIndex);
 
+            int angleIndex = 0;
             String maleJsonKey = ANGLES_KEY + AnatomyActivity.GENDER_MALE;
             JSONArray aAngles1 = layerObj.optJSONArray(maleJsonKey);
-            if (aAngles1.length() == 0) {
+            if (aAngles1 == null || aAngles1.length() == 0) {
                 Log.e("ERROR", "ERROR: No angle data is present at Male layer " + layerIndex);
             }
-
-            int angleIndex = 0;
-            for (int j = 0; j < aAngles1.length(); j++) {
-                JSONObject angleObj = aAngles1.optJSONObject(j);
-                String angleFolderName = layerFolderName + "/male/" + String.format("%02d", j);
-                JSONObject angleResolutionObj = angleObj.optJSONObject(_imageResolution);
-                AnatomyImage anatomyImage = new AnatomyImage(angleResolutionObj, angleFolderName, layerIndex, angleIndex);
-                _maleAnatomyImages.add(anatomyImage);
-                angleIndex++;
+            else{
+                for (int j = 0; j < aAngles1.length(); j++) {
+                    JSONObject angleObj = aAngles1.optJSONObject(j);
+                    String angleFolderName = layerFolderName + "/male/" + String.format("%02d", j);
+                    JSONObject angleResolutionObj = angleObj.optJSONObject(_imageResolution);
+                    AnatomyImage anatomyImage = new AnatomyImage(angleResolutionObj, angleFolderName, layerIndex, angleIndex);
+                    _maleAnatomyImages.add(anatomyImage);
+                    angleIndex++;
+                }
             }
 
             if (angleIndex > 0) {
@@ -267,20 +270,21 @@ public class AnatomyActivity extends Activity {
             }
 
 
+            angleIndex = 0;
             String femaleJsonKey = ANGLES_KEY + AnatomyActivity.GENDER_FEMALE;
             JSONArray aAngles2 = layerObj.optJSONArray(femaleJsonKey);
-            if (aAngles2.length() == 0) {
+            if (aAngles2 == null || aAngles2.length() == 0) {
                 Log.e("ERROR", "ERROR: No angle data is present at Female layer " + layerIndex);
             }
-
-            angleIndex = 0;
-            for (int j = 0; j < aAngles2.length(); j++) {
-                JSONObject angleObj = aAngles2.optJSONObject(j);
-                String angleFolderName = layerFolderName + "/female/" + String.format("%02d", j);
-                JSONObject angleResolutionObj = angleObj.optJSONObject(_imageResolution);
-                AnatomyImage anatomyImage = new AnatomyImage(angleResolutionObj, angleFolderName, layerIndex, angleIndex);
-                _femaleAnatomyImages.add(anatomyImage);
-                angleIndex++;
+            else{
+                for (int j = 0; j < aAngles2.length(); j++) {
+                    JSONObject angleObj = aAngles2.optJSONObject(j);
+                    String angleFolderName = layerFolderName + "/female/" + String.format("%02d", j);
+                    JSONObject angleResolutionObj = angleObj.optJSONObject(_imageResolution);
+                    AnatomyImage anatomyImage = new AnatomyImage(angleResolutionObj, angleFolderName, layerIndex, angleIndex);
+                    _femaleAnatomyImages.add(anatomyImage);
+                    angleIndex++;
+                }
             }
 
             if (angleIndex > 0) {
